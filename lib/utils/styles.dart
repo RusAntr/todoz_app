@@ -6,8 +6,20 @@ class Styles {
   final TextStyle textStyleTitle = GoogleFonts.poppins(
       color: Colors.black, fontSize: 25, fontWeight: FontWeight.w600);
 
+  final TextStyle textStyleNoProjects = GoogleFonts.poppins(
+      color: Colors.black.withOpacity(0.3),
+      fontSize: 15,
+      fontWeight: FontWeight.w600);
+
   final TextStyle textStyleWhiteText = GoogleFonts.poppins(
       color: Colors.white, fontSize: 15, fontWeight: FontWeight.normal);
+
+  final TextStyle textStyleProjectChipText = GoogleFonts.poppins(
+      color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600);
+  final TextStyle textStyleTodoCardProject = GoogleFonts.poppins(
+      color: Colors.black.withOpacity(0.3),
+      fontSize: 13,
+      fontWeight: FontWeight.w500);
 
   final TextStyle textStyleProgress = GoogleFonts.poppins(
       color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600);
@@ -21,11 +33,17 @@ class Styles {
   final TextStyle textStyleToDoUndoneText = GoogleFonts.poppins(
       color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600);
 
+  final TextStyle textStyleBlackSmallText = GoogleFonts.poppins(
+      color: Colors.black, fontSize: 13, fontWeight: FontWeight.w600);
+
   final TextStyle textStyleToDoDoneText = GoogleFonts.poppins(
       decoration: TextDecoration.lineThrough,
       color: Colors.black,
       fontSize: 16,
       fontWeight: FontWeight.w600);
+
+  final TextStyle textStyleAddTaskText = GoogleFonts.poppins(
+      color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500);
 
   final TextStyle textStyleDoneText = GoogleFonts.poppins(
       color: Colors.black.withOpacity(0.4),

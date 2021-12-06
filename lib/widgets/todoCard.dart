@@ -2,16 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:date_time_format/src/date_time_extension_methods.dart';
+import 'package:todoz_app/models/projectModel.dart';
 import 'package:todoz_app/models/todoModel.dart';
 import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/styles.dart';
 
 class TodoCard extends StatelessWidget {
   final String? uid;
-  final String? todoId;
   final TodoModel? todoModel;
+  final ProjectModel? projectModel;
 
-  const TodoCard({Key? key, this.todoModel, this.todoId, this.uid})
+  const TodoCard({Key? key, this.todoModel, this.uid, this.projectModel})
       : super(key: key);
 
   @override
@@ -25,10 +26,12 @@ class TodoCard extends StatelessWidget {
           onLongPress: () {
             if (todoModel!.isDone == false) {
               var a = todoModel!.isDone = true;
-              Database().updateTodo(a, uid!, todoModel!.todoId!);
+              Database().updateTodo(
+                  a, uid!, todoModel!.todoId!, todoModel!.projectName!);
             } else {
               var a = todoModel!.isDone = false;
-              Database().updateTodo(a, uid!, todoModel!.todoId!);
+              Database().updateTodo(
+                  a, uid!, todoModel!.todoId!, todoModel!.projectName!);
             }
           },
           child: Container(
@@ -45,11 +48,17 @@ class TodoCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
+                    todoModel!.projectName!,
+                    style: Styles().textStyleTodoCardProject,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Text(
                     todoModel!.content.toString(),
                     style: todoModel!.isDone == true
                         ? Styles().textStyleToDoDoneText
                         : Styles().textStyleToDoUndoneText,
-                    maxLines: 4,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Row(
@@ -67,7 +76,6 @@ class TodoCard extends StatelessWidget {
                             .toDate()
                             .format('M, j')
                             .toString(),
-                        //.substring(5, 16),
                         style: Styles().textStyleDoneText,
                       ),
                     ],

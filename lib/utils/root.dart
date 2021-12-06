@@ -4,6 +4,7 @@ import 'package:todoz_app/controllers/authController.dart';
 import 'package:todoz_app/controllers/userController.dart';
 import 'package:todoz_app/pages/home.dart';
 import 'package:todoz_app/pages/signUp.dart';
+import 'package:todoz_app/widgets/tab_view_home.dart';
 
 class Root extends GetWidget<AuthController> {
   @override
@@ -15,7 +16,7 @@ class Root extends GetWidget<AuthController> {
         },
         builder: (_) {
           if (Get.find<AuthController>().user?.uid != null) {
-            return Home();
+            return TabViewHome();
           } else {
             return SignUp();
           }

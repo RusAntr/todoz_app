@@ -13,6 +13,14 @@ class AppTranslations extends Translations {
           'taskDone': 'done',
           'taskUndone': 'undone',
           'inProgress': 'In progress',
+          'newTask': 'New task',
+          'addToProject': 'Add to a project',
+          'titleHint': 'Title',
+          'noProjects': 'No Projects',
+          'addTodo': 'Add',
+          'profilePage': 'Profile',
+          'projectsPage': 'Projects',
+          'homePage': 'Tasks',
         },
         'ru': {
           'title': 'Список дел',
@@ -23,7 +31,15 @@ class AppTranslations extends Translations {
           'toDo': 'Задачи',
           'taskDone': 'сделано',
           'taskUndone': 'не сделано',
-          'inProgress': 'В процессе'
+          'inProgress': 'В процессе',
+          'newTask': 'Новая задача',
+          'addToProject': 'Добавить в проект',
+          'titleHint': 'Название',
+          'noProjects': 'Нет проектов',
+          'addTodo': 'Добавить',
+          'profilePage': 'Профиль',
+          'projectsPage': 'Проекты',
+          'homePage': 'Задачи',
         },
       };
 }
