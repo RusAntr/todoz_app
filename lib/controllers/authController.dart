@@ -10,7 +10,7 @@ import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/root.dart';
 
 class AuthController extends GetxController {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   late Rx<User?> _firebaseUser;
   User? get user => _firebaseUser.value;
 
@@ -21,12 +21,13 @@ class AuthController extends GetxController {
     super.onInit();
   }
 
+  /// Calls firebase, creates user, will be automatically updated.
   void createUser(String name, String email, String password) async {
-    // call firebase, create user, will be automatically updated
     try {
       UserCredential _userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
-      //create user in database.dart
+
+      /// Creates user in database.dart
       UserModel _user = UserModel(
           id: _userCredential.user?.uid,
           email: _userCredential.user?.email,
@@ -58,6 +59,7 @@ class AuthController extends GetxController {
     }
   }
 
+  /// Signs user out of the app.
   void signOut() async {
     try {
       await _auth.signOut();

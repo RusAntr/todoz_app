@@ -9,8 +9,8 @@ import 'package:todoz_app/controllers/todoController.dart';
 import 'package:todoz_app/models/todoModel.dart';
 import 'package:todoz_app/utils/styles.dart';
 
-class TodayProgress extends StatelessWidget {
-  TodayProgress({Key? key}) : super(key: key);
+class TodayProgressWidget extends StatelessWidget {
+  TodayProgressWidget({Key? key}) : super(key: key);
   final dateTime = DateTime.now();
 
   int get howManyDone {
@@ -40,9 +40,10 @@ class TodayProgress extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
 
     return Container(
-      padding: const EdgeInsets.all(30),
+      padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40), color: Color(0xFF6E4AFF)),
+          borderRadius: BorderRadius.circular(40),
+          color: const Color(0xFF6E4AFF)),
       height: height / 5,
       width: width,
       child: GetX<TodoController>(
@@ -72,16 +73,22 @@ class TodayProgress extends StatelessWidget {
                     ],
                   ),
                   CircularPercentIndicator(
-                    radius: 75,
+                    radius: 80,
                     fillColor: Colors.transparent,
-                    backgroundColor: Colors.transparent,
+                    backgroundColor: Colors.white.withOpacity(0.3),
+                    animateFromLastPercent: true,
+                    animation: true,
+                    circularStrokeCap: CircularStrokeCap.round,
+                    animationDuration: 500,
                     center: Text(
-                      percentage == 0
-                          ? 'start NOW'
-                          : percentage.toString().substring(0, 4) + '%',
+                      (percentage == 0)
+                          ? '0% :('
+                          : (percentage == 100)
+                              ? '100%'
+                              : percentage.toString().substring(0, 4) + '%',
                       style: Styles().textStyleProgress,
                     ),
-                    progressColor: Colors.white,
+                    progressColor: const Color(0xFF5430E5),
                     lineWidth: 7.0,
                     percent: percentage / 100,
                   )
@@ -105,18 +112,6 @@ class TodayProgress extends StatelessWidget {
                             style: Styles().textStyleWhiteBigText)
                       ],
                     ),
-                    CircularPercentIndicator(
-                      radius: 75,
-                      fillColor: Colors.transparent,
-                      backgroundColor: Colors.transparent,
-                      center: Text(
-                        '0 %',
-                        style: Styles().textStyleProgress,
-                      ),
-                      progressColor: Colors.white,
-                      lineWidth: 7.0,
-                      percent: percentage / 100,
-                    )
                   ]);
             }
           }),

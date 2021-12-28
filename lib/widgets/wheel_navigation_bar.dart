@@ -4,31 +4,33 @@ import 'package:todoz_app/utils/styles.dart';
 
 class WheelNavigationBar extends StatelessWidget {
   final List<WheelNavigationItem>? items;
-  int? currentIndex;
-  double? itemExtent;
+  final int? currentIndex;
+  final double? itemExtent;
   final ValueChanged<int>? onSelectedItemChanged;
   final ScrollController? scrollController;
-  ScrollPhysics? physics;
-  Axis? axis;
+  final ScrollPhysics? physics;
+  final Axis? axis;
+  final double? radius;
 
-  WheelNavigationBar({
-    Key? key,
-    this.physics,
-    this.axis,
-    @required this.currentIndex,
-    @required this.scrollController,
-    @required this.itemExtent,
-    @required this.items,
-    @required this.onSelectedItemChanged,
-  }) : super(key: key);
+  const WheelNavigationBar(
+      {Key? key,
+      this.physics,
+      this.axis,
+      @required this.currentIndex,
+      @required this.scrollController,
+      @required this.itemExtent,
+      @required this.items,
+      @required this.onSelectedItemChanged,
+      @required this.radius})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return CircleListScrollView(
-      radius: 60,
-      axis: Axis.horizontal,
+      radius: radius!,
+      axis: axis!,
       itemExtent: itemExtent!,
-      physics: BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       onSelectedItemChanged: onSelectedItemChanged,
       children: [
         for (final item in items!)
@@ -36,11 +38,8 @@ class WheelNavigationBar extends StatelessWidget {
             child: Column(
               children: [
                 items!.indexOf(item) == currentIndex
-                    ? Text(
-                        item.title,
-                        style: Styles().textStyleBlackSmallText,
-                      )
-                    : Text(''),
+                    ? Text(item.title, style: Styles().textStyleBlackSmallText)
+                    : const Text(''),
                 items!.indexOf(item) == currentIndex
                     ? item.activeIcon!
                     : item.icon,

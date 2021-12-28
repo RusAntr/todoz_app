@@ -3,29 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:todoz_app/controllers/authController.dart';
-import 'package:todoz_app/controllers/projectController.dart';
 import 'package:todoz_app/controllers/todoController.dart';
 import 'package:todoz_app/controllers/userController.dart';
 import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/styles.dart';
-import 'package:todoz_app/widgets/todayProgress.dart';
+import 'package:todoz_app/widgets/today_progress_widget.dart';
 import 'package:todoz_app/widgets/todoCard.dart';
 
 class Home extends GetWidget<AuthController> {
-  final TextEditingController _projectController = TextEditingController();
+  const Home({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return ListView(
+      physics: const BouncingScrollPhysics(),
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 40, 20, 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 20, 15, 0),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   //USERNAME
@@ -40,6 +41,7 @@ class Home extends GetWidget<AuthController> {
                       return Text('loading', style: Styles().textStyleTitle);
                     }
                   }),
+                  //ARCHIVE BUTTON
                   IconButton(
                     splashColor: Colors.transparent,
                     highlightColor: Colors.transparent,
@@ -49,14 +51,21 @@ class Home extends GetWidget<AuthController> {
                   )
                 ],
               ),
-              SizedBox(height: height / 40),
-              TodayProgress(),
-              SizedBox(height: height / 40),
-              Row(
+            ),
+            SizedBox(height: height / 40),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
+              child: TodayProgressWidget(),
+            ),
+            SizedBox(height: height / 40),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text('toDo'.tr, style: Styles().textStyleBlackBigText),
                   const SizedBox(width: 10),
+                  //INDICATOR
                   Container(
                     height: height / 30,
                     width: width / 15,
@@ -67,17 +76,11 @@ class Home extends GetWidget<AuthController> {
                       child: GetX<TodoController>(
                           init: Get.put<TodoController>(TodoController()),
                           builder: (TodoController todoController) {
-                            List undoneTasks = [];
-                            if (todoController.isBlank != null &&
-                                todoController.todos.isNotEmpty) {
-                              todoController.todos.forEach((element) {
-                                if (element!.isDone == false) {
-                                  undoneTasks.add(element);
-                                }
-                              });
-                            } else {}
                             return Text(
-                              undoneTasks.length.toString(),
+                              todoController.todos
+                                  .where((element) => element!.isDone == false)
+                                  .length
+                                  .toString(),
                               style: Styles().textStyleSmallGreenText,
                             );
                           }),
@@ -85,33 +88,35 @@ class Home extends GetWidget<AuthController> {
                   )
                 ],
               ),
-              SizedBox(height: height / 100),
-              GetX<TodoController>(
-                  init: Get.put<TodoController>(TodoController()),
-                  builder: (TodoController todoController) {
-                    if (todoController.isBlank != null &&
-                        todoController.todos.isNotEmpty) {
-                      return Container(
-                        height: height / 4,
-                        child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: todoController.todos.length,
-                            itemBuilder: (_, index) {
-                              var pm = Get.find<ProjectController>();
-                              return TodoCard(
-                                uid: controller.user!.uid,
-                                todoModel: todoController.todos[index],
-                              );
-                            }),
-                      );
-                    } else {
-                      return Text('loading', style: Styles().textStyleTitle);
-                    }
-                  }),
-              SizedBox(height: height / 80),
-              Row(
+            ),
+            SizedBox(height: height / 80),
+            GetX<TodoController>(
+                init: Get.put<TodoController>(TodoController()),
+                builder: (TodoController todoController) {
+                  if (todoController.isBlank != null &&
+                      todoController.todos.isNotEmpty) {
+                    return SizedBox(
+                      height: height / 5,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: todoController.todos.length,
+                          itemBuilder: (_, index) {
+                            return TodoCard(
+                              uid: controller.user!.uid,
+                              todoModel: todoController.todos[index]!,
+                            );
+                          }),
+                    );
+                  } else {
+                    return Text('loading', style: Styles().textStyleTitle);
+                  }
+                }),
+            SizedBox(height: height / 80),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text('inProgress'.tr, style: Styles().textStyleBlackBigText),
@@ -138,36 +143,36 @@ class Home extends GetWidget<AuthController> {
                   )
                 ],
               ),
-              Card(
-                  child: Row(
-                children: [
-                  Expanded(
-                      child: TextFormField(
-                    controller: _projectController,
-                    decoration: InputDecoration(),
-                  )),
-                  IconButton(
-                      onPressed: () {
-                        if (_projectController.text != "") {
-                          Database().addProject(
-                              projectName: _projectController.text,
-                              uid: controller.user!.uid);
-                        } else {
-                          Get.snackbar('Error', 'Error 2',
-                              snackPosition: SnackPosition.BOTTOM);
-                        }
-                      },
-                      icon: const Icon(Icons.add))
-                ],
-              )),
-              ElevatedButton(
-                child: const Text('sign out'),
-                onPressed: () {
-                  controller.signOut();
-                },
-              ),
-            ],
-          ),
+            ),
+            // Card(
+            //     child: Row(
+            //   children: [
+            //     Expanded(
+            //         child: TextFormField(
+            //       controller: _projectController,
+            //       decoration: InputDecoration(),
+            //     )),
+            //     IconButton(
+            //         onPressed: () {
+            //           if (_projectController.text != "") {
+            //             Database().addProject(
+            //                 projectName: _projectController.text,
+            //                 uid: controller.user!.uid);
+            //           } else {
+            //             Get.snackbar('Error', 'Error 2',
+            //                 snackPosition: SnackPosition.BOTTOM);
+            //           }
+            //         },
+            //         icon: const Icon(Icons.add))
+            //   ],
+            // )),
+            ElevatedButton(
+              child: const Text('sign out'),
+              onPressed: () {
+                controller.signOut();
+              },
+            ),
+          ],
         ),
       ],
     );

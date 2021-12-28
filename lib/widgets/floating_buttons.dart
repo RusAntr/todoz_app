@@ -1,26 +1,12 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:todoz_app/models/todoModel.dart';
+import 'package:todoz_app/controllers/projectController.dart';
+import 'package:todoz_app/controllers/todoController.dart';
 
 class FloatingButtons extends StatelessWidget {
   FloatingButtons({Key? key, this.index}) : super(key: key);
 
   int? index;
-
-  final Widget createToDo = Container(
-    height: 50,
-    width: 50,
-    decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: const Color(0xffEBE4FF),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.17),
-              offset: const Offset(0, 20),
-              blurRadius: 15)
-        ]),
-    child: const Icon(EvaIcons.plus, color: Color(0xff6E4AFF), size: 30),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +14,12 @@ class FloatingButtons extends StatelessWidget {
         top: index == 2 ? 100 : 35,
         duration: const Duration(milliseconds: 500),
         child: GestureDetector(
-            onTap: () => TodoModel().openCreateTodo(context),
+            onTap: () {
+              index == 0
+                  ? TodoController().openCreateTodo(context, true, null)
+                  : ProjectController()
+                      .openCreateProject(context, null, true, null);
+            },
             child: AnimatedContainer(
                 duration: index == 0
                     ? const Duration(milliseconds: 1000)
@@ -39,7 +30,7 @@ class FloatingButtons extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: (index == 0)
                         ? const Color(0xffEBE4FF)
-                        : const Color(0xffFFD4D4),
+                        : Colors.white.withOpacity(0.5),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withOpacity(0.17),

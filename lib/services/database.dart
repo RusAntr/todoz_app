@@ -33,17 +33,17 @@ class Database {
   }
 
   Future<void> addProject(
-      {@required String? projectName, @required String? uid}) async {
+      {@required String? projectName,
+      @required String? uid,
+      @required Color? color,
+      @required String? projectCover}) async {
     try {
-      await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('projects')
-          .doc(projectName)
-          .set({
-        'projectName': projectName,
+      await _firestore.collection('users').doc(uid).collection('projects').add({
+        'projectName': projectName!,
         'dateCreated': Timestamp.now(),
-        'isFinished': false
+        'isFinished': false,
+        'color': color!.value.toString(),
+        'projectCover': projectCover!,
       });
     } catch (e) {
       print(e);
@@ -55,7 +55,7 @@ class Database {
         .collection('users')
         .doc(uid)
         .collection('projects')
-        .orderBy('projectName', descending: false)
+        .orderBy('dateCreated', descending: true)
         .snapshots()
         .map((QuerySnapshot query) {
       List<ProjectModel> retVal = [];
@@ -66,18 +66,17 @@ class Database {
     });
   }
 
-  //TODO: IMPLEMENT ProjectModel & Controller ; CREATE Functions to get projects
-
   Future<void> addTodo(
       {@required String? content,
       @required String? uid,
-      String? projectName}) async {
+      @required String? projectId,
+      @required String? projectName}) async {
     try {
       await _firestore
           .collection('users')
           .doc(uid)
           .collection('projects')
-          .doc(projectName)
+          .doc(projectId)
           .collection('todos')
           .add({
         'dateCreated': Timestamp.now(),
@@ -103,17 +102,56 @@ class Database {
     });
   }
 
-  Future<void> updateTodo(
-      bool newValue, String uid, String todoId, String projectName) async {
+  Future<void> updateTodo(bool newValue, String uid, String todoId,
+      String projectId, String? projectName) async {
+    if (projectId != 'NoProject') {
+      try {
+        _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('projects')
+            .doc(projectId)
+            .collection('todos')
+            .doc(todoId)
+            .update({'isDone': newValue, 'projectName': projectName});
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      try {
+        _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('projects')
+            .doc('NoProject')
+            .collection('todos')
+            .doc(todoId)
+            .update({'isDone': newValue});
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  Future<void> updateProject(Color color, String uid, String projectCover,
+      String projectName, String projectId, List<TodoModel?>? todoModel) async {
     try {
       _firestore
           .collection('users')
           .doc(uid)
           .collection('projects')
-          .doc(projectName)
-          .collection('todos')
-          .doc(todoId)
-          .update({'isDone': newValue});
+          .doc(projectId)
+          .update({
+        'projectName': projectName,
+        'projectCover': projectCover,
+        'color': color.value.toString()
+      });
+      if (todoModel != null) {
+        for (var element in todoModel) {
+          updateTodo(
+              element!.isDone, uid, element.todoId, projectId, projectName);
+        }
+      }
     } catch (e) {
       print(e);
     }

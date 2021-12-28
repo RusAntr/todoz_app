@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:todoz_app/pages/home.dart';
+import 'package:todoz_app/pages/projects_page.dart';
 import 'package:todoz_app/utils/circleWheelScroll/circle_wheel_scroll_view.dart'
     as circle_wheel;
 import 'package:todoz_app/widgets/floating_buttons.dart';
-import 'package:todoz_app/widgets/todayProgress.dart';
 import 'package:todoz_app/widgets/wheel_navigation_bar.dart';
 
 import 'createTodo.dart';
@@ -32,7 +32,13 @@ class _TabViewHomeState extends State<TabViewHome> {
         Icon(Icons.circle, color: Colors.black.withOpacity(0.7), size: 12)),
   ];
 
-  List<Widget> pages = [Home(), TodayProgress(), CreateTodo()];
+  List<Widget> pages = [
+    const Home(),
+    const ProjectsPage(),
+    CreateTodo(
+      visibility: true,
+    )
+  ];
   int currentIndex = 0;
   late PageController _pageController;
   late circle_wheel.FixedExtentScrollController _scrollController;
@@ -56,45 +62,54 @@ class _TabViewHomeState extends State<TabViewHome> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-        bottomNavigationBar: Container(
-          height: 100,
-          width: width,
-          child: Stack(
-            alignment: AlignmentDirectional.center,
-            children: [
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                bottom: currentIndex == 2 ? 10 : 35,
-                child: Container(
-                  width: width,
-                  height: 70,
-                  child: WheelNavigationBar(
-                    scrollController: _scrollController,
-                    itemExtent: 70,
-                    onSelectedItemChanged: (int index) => setState(() {
+        backgroundColor: Colors.white,
+        body: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            PageView(
+                children: pages,
+                pageSnapping: true,
+                controller: _pageController,
+                onPageChanged: (int index) => setState(() {
                       currentIndex = index;
-                      _pageController.animateToPage(currentIndex,
-                          duration: Duration(milliseconds: 500),
-                          curve: Curves.fastLinearToSlowEaseIn);
-                    }),
-                    currentIndex: currentIndex,
-                    items: list,
+                      _scrollController.animateToItem(currentIndex,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeIn);
+                    })),
+            Container(
+              color: Colors.transparent,
+              height: 100,
+              width: width,
+              child: Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 500),
+                    bottom: currentIndex == 2 ? 10 : 35,
+                    child: SizedBox(
+                      width: width,
+                      height: 70,
+                      child: WheelNavigationBar(
+                        axis: Axis.horizontal,
+                        radius: 60,
+                        scrollController: _scrollController,
+                        itemExtent: 70,
+                        onSelectedItemChanged: (int index) => setState(() {
+                          currentIndex = index;
+                          _pageController.animateToPage(currentIndex,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.linear);
+                        }),
+                        currentIndex: currentIndex,
+                        items: list,
+                      ),
+                    ),
                   ),
-                ),
+                  FloatingButtons(index: currentIndex)
+                ],
               ),
-              FloatingButtons(index: currentIndex)
-            ],
-          ),
-        ),
-        body: PageView(
-            children: pages,
-            pageSnapping: true,
-            controller: _pageController,
-            onPageChanged: (int index) => setState(() {
-                  currentIndex = index;
-                  _scrollController.animateToItem(currentIndex,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeIn);
-                })));
+            ),
+          ],
+        ));
   }
 }

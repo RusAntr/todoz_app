@@ -2,7 +2,6 @@
 import 'package:get/get.dart';
 import 'package:todoz_app/controllers/authController.dart';
 import 'package:todoz_app/controllers/projectController.dart';
-import 'package:todoz_app/controllers/todoController.dart';
 
 class AuthBinding extends Bindings {
   @override

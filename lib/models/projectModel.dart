@@ -3,22 +3,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProjectModel {
-  // late String? projectId;
-  late String? projectName;
-  late Timestamp? dateCreated;
-  late bool? isFinished;
+  late String projectName;
+  late Timestamp dateCreated;
+  late bool isFinished;
+  late String color;
+  late String projectCover;
+  late String projectId;
 
   ProjectModel(
-      {
-      //this.projectId,
-      this.projectName,
-      this.dateCreated,
-      this.isFinished});
+      {required this.color,
+      required this.projectName,
+      required this.dateCreated,
+      required this.isFinished,
+      required this.projectCover,
+      required this.projectId});
 
   ProjectModel.fromDocumentSnapshot(DocumentSnapshot? documentSnapshot) {
-    // projectId = documentSnapshot?.id;
     projectName = documentSnapshot?['projectName'];
     dateCreated = documentSnapshot?['dateCreated'];
     isFinished = documentSnapshot?['isFinished'];
+    color = documentSnapshot?['color'];
+    projectCover = documentSnapshot?['projectCover'];
+    projectId = documentSnapshot!.id;
   }
 }
