@@ -1,10 +1,8 @@
-// ignore_for_file: file_names
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:todoz_app/controllers/authController.dart';
+import 'package:todoz_app/controllers/auth_controller.dart';
 
 class LogIn extends GetWidget<AuthController> {
   final TextEditingController _emailController = TextEditingController();

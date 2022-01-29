@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Styles {
-  ///TextStyles
-
   final TextStyle textStyleTitle = GoogleFonts.poppins(
       color: Colors.black, fontSize: 25, fontWeight: FontWeight.w600);
+
+  final TextStyle noTasksToDo = GoogleFonts.poppins(
+      color: Colors.black.withOpacity(0.2),
+      fontSize: 22,
+      fontWeight: FontWeight.w600);
 
   final TextStyle textStyleNoProjects = GoogleFonts.poppins(
       color: Colors.black.withOpacity(0.3),
@@ -60,6 +63,16 @@ class Styles {
   final TextStyle textStyleToDoUndoneText = GoogleFonts.poppins(
       color: Colors.black, fontSize: 15, fontWeight: FontWeight.w600);
 
+  final TextStyle timePassedVsDuration = GoogleFonts.poppins(
+      color: Colors.black.withOpacity(0.3),
+      fontSize: 12,
+      fontWeight: FontWeight.w600);
+
+  final TextStyle progressWidgetContent = GoogleFonts.poppins(
+      color: const Color(0xFF1C1036),
+      fontSize: 18,
+      fontWeight: FontWeight.w600);
+
   final TextStyle textStyleBlackSmallText = GoogleFonts.poppins(
       color: Colors.black, fontSize: 13, fontWeight: FontWeight.w600);
 
@@ -74,7 +87,7 @@ class Styles {
 
   final TextStyle textStyleDoneText = GoogleFonts.poppins(
       color: Colors.black.withOpacity(0.4),
-      fontSize: 11,
+      fontSize: 10,
       fontWeight: FontWeight.normal);
 
   final TextStyle textStyleSmallGreenText = GoogleFonts.poppins(

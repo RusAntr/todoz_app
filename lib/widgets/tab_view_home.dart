@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
-import 'package:todoz_app/pages/home.dart';
+import 'package:todoz_app/pages/home_page.dart';
 import 'package:todoz_app/pages/projects_page.dart';
 import 'package:todoz_app/utils/circleWheelScroll/circle_wheel_scroll_view.dart'
     as circle_wheel;
 import 'package:todoz_app/widgets/floating_buttons.dart';
 import 'package:todoz_app/widgets/wheel_navigation_bar.dart';
 
-import 'createTodo.dart';
+import 'create_todo_widget.dart';
 
 class TabViewHome extends StatefulWidget {
   const TabViewHome({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class _TabViewHomeState extends State<TabViewHome> {
   ];
 
   List<Widget> pages = [
-    const Home(),
+    Home(),
     const ProjectsPage(),
     CreateTodo(
       visibility: true,
@@ -67,6 +67,7 @@ class _TabViewHomeState extends State<TabViewHome> {
           alignment: Alignment.bottomCenter,
           children: [
             PageView(
+                physics: const BouncingScrollPhysics(),
                 children: pages,
                 pageSnapping: true,
                 controller: _pageController,

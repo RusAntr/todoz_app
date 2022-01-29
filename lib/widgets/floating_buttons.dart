@@ -1,7 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:todoz_app/controllers/projectController.dart';
-import 'package:todoz_app/controllers/todoController.dart';
+import 'package:todoz_app/controllers/project_controller.dart';
+import 'package:todoz_app/controllers/todo_controller.dart';
 
 class FloatingButtons extends StatelessWidget {
   FloatingButtons({Key? key, this.index}) : super(key: key);

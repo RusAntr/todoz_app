@@ -1,14 +1,10 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:todoz_app/controllers/authController.dart';
-import 'package:todoz_app/controllers/todoController.dart';
-import 'package:todoz_app/models/projectModel.dart';
-import 'package:todoz_app/models/todoModel.dart';
+import 'package:todoz_app/controllers/auth_controller.dart';
+import 'package:todoz_app/models/project_model.dart';
+import 'package:todoz_app/models/todo_model.dart';
 import 'package:todoz_app/services/database.dart';
-import 'package:todoz_app/widgets/create_project_widget.dart';
+import 'package:todoz_app/widgets/create_change_project_widget.dart';
 
 class ProjectController extends GetxController {
   final Rx<List<ProjectModel?>> _projectList = Rx<List<ProjectModel?>>([]);
@@ -20,6 +16,20 @@ class ProjectController extends GetxController {
     String uid = Get.find<AuthController>().user!.uid;
     _projectList.bindStream(Database().getProjects(uid));
     super.onInit();
+  }
+
+  String getProjectId(TodoModel todoModel) {
+    String projectId;
+    if (todoModel.projectName == 'NoProject') {
+      projectId = 'NoProject';
+    } else {
+      final project = Get.find<ProjectController>();
+      projectId = project.projects
+          .where((element) => element!.projectName == todoModel.projectName)
+          .first!
+          .projectId;
+    }
+    return projectId;
   }
 
   void addProject(TextEditingController controller, String uid, Color color,

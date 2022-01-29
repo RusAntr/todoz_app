@@ -1,6 +1,5 @@
-// ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import 'package:todoz_app/models/projectModel.dart';
+import 'package:todoz_app/models/project_model.dart';
 import 'package:todoz_app/utils/styles.dart';
 
 class ProjectChoiceChip extends StatelessWidget {

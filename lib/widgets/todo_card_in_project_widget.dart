@@ -2,7 +2,7 @@ import 'package:date_time_format/src/date_time_extension_methods.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
-import 'package:todoz_app/models/todoModel.dart';
+import 'package:todoz_app/models/todo_model.dart';
 import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/styles.dart';
 
@@ -37,16 +37,21 @@ class _TodoCardInProjectWidgetState extends State<TodoCardInProjectWidget> {
         if (widget.todoModel.isDone == false) {
           bool newValue = widget.todoModel.isDone = true;
           Database().updateTodo(
-            newValue,
-            widget.uid,
-            widget.todoModel.todoId,
-            widget.projectId,
-            widget.projectName,
-          );
+              newValue,
+              widget.uid,
+              widget.todoModel.todoId,
+              widget.projectId,
+              widget.projectName,
+              widget.todoModel.timePassed);
         } else {
           bool newValue = widget.todoModel.isDone = false;
-          Database().updateTodo(newValue, widget.uid, widget.todoModel.todoId,
-              widget.projectId, widget.projectName);
+          Database().updateTodo(
+              newValue,
+              widget.uid,
+              widget.todoModel.todoId,
+              widget.projectId,
+              widget.projectName,
+              widget.todoModel.timePassed);
         }
       },
       child: Column(

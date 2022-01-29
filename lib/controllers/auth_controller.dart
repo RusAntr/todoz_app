@@ -1,11 +1,9 @@
-// ignore_for_file: file_names
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:todoz_app/controllers/userController.dart';
-import 'package:todoz_app/models/userModel.dart';
-import 'package:todoz_app/pages/home.dart';
-import 'package:todoz_app/pages/signUp.dart';
+import 'package:todoz_app/controllers/user_controller.dart';
+import 'package:todoz_app/models/user_model.dart';
+import 'package:todoz_app/pages/home_page.dart';
+import 'package:todoz_app/pages/sign_up_page.dart';
 import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/root.dart';
 

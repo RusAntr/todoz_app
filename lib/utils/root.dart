@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:todoz_app/controllers/authController.dart';
-import 'package:todoz_app/controllers/userController.dart';
-import 'package:todoz_app/pages/signUp.dart';
+import 'package:todoz_app/controllers/auth_controller.dart';
+import 'package:todoz_app/controllers/user_controller.dart';
+import 'package:todoz_app/pages/sign_up_page.dart';
 import 'package:todoz_app/widgets/tab_view_home.dart';
 
 class Root extends GetWidget<AuthController> {

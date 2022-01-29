@@ -1,11 +1,10 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todoz_app/controllers/authController.dart';
-import 'package:todoz_app/controllers/projectController.dart';
-import 'package:todoz_app/controllers/todoController.dart';
-import 'package:todoz_app/models/projectModel.dart';
-import 'package:todoz_app/models/todoModel.dart';
+import 'package:todoz_app/controllers/auth_controller.dart';
+import 'package:todoz_app/controllers/project_controller.dart';
+import 'package:todoz_app/models/project_model.dart';
+import 'package:todoz_app/models/todo_model.dart';
 import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/styles.dart';
 import 'package:todoz_app/widgets/color_picker.dart';
@@ -14,10 +13,13 @@ import 'package:todoz_app/widgets/project_card_widget.dart';
 
 class CreateProjectWidget extends StatefulWidget {
   const CreateProjectWidget(
-      {Key? key, this.projectModel, this.isCreate, required this.todoModel})
+      {Key? key,
+      this.projectModel,
+      required this.isCreate,
+      required this.todoModel})
       : super(key: key);
   final ProjectModel? projectModel;
-  final bool? isCreate;
+  final bool isCreate;
   final List<TodoModel?>? todoModel;
 
   @override
@@ -31,6 +33,30 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
   late Color _pickedColor;
   late String _pickedCover;
   late String _projectName;
+
+  void createOrChange() {
+    if (widget.isCreate == true) {
+      List<String> retVal = [];
+      for (var element in _projectController.projects) {
+        retVal.add(element!.projectName);
+      }
+      if (retVal.contains(_textEditingController.text) == false) {
+        ProjectController().addProject(_textEditingController,
+            _authcontroller.user!.uid, _pickedColor, _pickedCover);
+      } else {
+        Get.snackbar('Error', 'Project already exist',
+            snackPosition: SnackPosition.BOTTOM);
+      }
+    } else {
+      Database().updateProject(
+          _pickedColor,
+          _authcontroller.user!.uid,
+          _pickedCover,
+          _projectName,
+          widget.projectModel!.projectId,
+          widget.todoModel);
+    }
+  }
 
   static const List<Color> colors = [
     Color(0xffF7AD78),
@@ -68,7 +94,9 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
     _authcontroller = Get.find<AuthController>();
     _textEditingController = TextEditingController();
     _projectController = Get.find<ProjectController>();
-    _projectName = 'newProject'.tr;
+    _projectName = widget.isCreate == true
+        ? 'newProject'.tr
+        : widget.projectModel!.projectName;
     _pickedColor = widget.isCreate == true
         ? colors[0]
         : Color(int.parse(widget.projectModel!.color));
@@ -84,7 +112,8 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
     super.dispose();
   }
 
-  Widget createProject(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Material(
@@ -103,7 +132,7 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
               ),
               Center(
                 child: Text(
-                  'newProject'.tr,
+                  widget.isCreate == true ? 'newProject'.tr : 'change'.tr,
                   style: Styles().textStyleAddTaskText,
                 ),
               ),
@@ -141,7 +170,7 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
               height: height / 2,
               width: width - 10,
               color: _pickedColor.value.toString(),
-              projectName: _textEditingController.text,
+              projectName: _projectName,
             ),
           ),
           Padding(
@@ -209,8 +238,32 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
           ),
           SizedBox(height: height / 60),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              widget.isCreate == false
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            elevation: MaterialStateProperty.all<double>(0),
+                            shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(100))),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                const Color(0xff6E4AFF).withOpacity(0.3))),
+                        onPressed: () {
+                          setState(() {
+                            Database().deleteProject(
+                                _authcontroller.user!.uid,
+                                widget.projectModel!.projectId,
+                                widget.todoModel);
+                          });
+                        },
+                        child: const Icon(EvaIcons.trash2Outline),
+                      ),
+                    )
+                  : Container(),
               Padding(
                 padding: const EdgeInsets.only(right: 20),
                 child: ElevatedButton(
@@ -223,24 +276,12 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
                         backgroundColor: MaterialStateProperty.all<Color>(
                             const Color(0xff6E4AFF))),
                     onPressed: () {
-                      List<String?> retVal = [];
-                      for (var element in _projectController.projects) {
-                        retVal.add(element!.projectName);
-                      }
-                      if (retVal.contains(_textEditingController.text) ==
-                          false) {
-                        ProjectController().addProject(
-                            _textEditingController,
-                            _authcontroller.user!.uid,
-                            _pickedColor,
-                            _pickedCover);
-                      } else {
-                        Get.snackbar('Error', 'Project already exist',
-                            snackPosition: SnackPosition.BOTTOM);
-                      }
+                      setState(() {
+                        createOrChange();
+                      });
                     },
                     child: Text(
-                      'create'.tr,
+                      widget.isCreate == true ? 'create'.tr : 'change'.tr,
                       style: Styles().textStyleProjectChipText,
                     )),
               ),
@@ -249,173 +290,5 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
         ],
       ),
     );
-  }
-
-  Widget changeProject(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-    return Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const SizedBox(
-                width: 20,
-              ),
-              const Spacer(
-                flex: 2,
-              ),
-              Center(
-                child: Text(
-                  'changeProject'.tr,
-                  style: Styles().textStyleAddTaskText,
-                ),
-              ),
-              const Spacer(flex: 1),
-              Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: TextButton(
-                    style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            const EdgeInsets.only(right: 5, left: 5)),
-                        overlayColor: MaterialStateProperty.all<Color>(
-                            Colors.black.withOpacity(0.1)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(200))),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xffF2F4F5))),
-                    onPressed: () {
-                      Get.back();
-                    },
-                    child: const Icon(
-                      EvaIcons.close,
-                      color: Colors.black,
-                      size: 25,
-                    )),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
-            child: ProjectCardWidget(
-              isCreate: false,
-              cover: _pickedCover,
-              height: height / 2,
-              width: width - 10,
-              color: _pickedColor.value.toString(),
-              projectName: widget.projectModel!.projectName,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15),
-            child: TextField(
-              onChanged: (value) => setState(() {
-                widget.projectModel!.projectName = _textEditingController.text;
-              }),
-              controller: _textEditingController,
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(17),
-                  focusedBorder: const OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
-                  filled: true,
-                  fillColor: const Color(0xFFEEF1F7),
-                  border: const OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
-                  hintText: 'titleHint'.tr,
-                  hintStyle: const TextStyle(fontSize: 16)),
-            ),
-          ),
-          const SizedBox(height: 15),
-          Padding(
-            padding: const EdgeInsets.only(left: 15),
-            child: Text(
-              'chooseColor'.tr,
-              style: Styles().textStyleBlackSmallText,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 5, bottom: 5),
-            child: ColorPicker(
-              availableColors: colors,
-              initialColor: _pickedColor,
-              onSelectColor: (Color value) {
-                setState(() {
-                  _pickedColor = value;
-                });
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 15),
-            child: Text(
-              'chooseCover'.tr,
-              style: Styles().textStyleBlackSmallText,
-            ),
-          ),
-          CoverPicker(
-            availableCovers: urlImages,
-            initialCover: _pickedCover,
-            onSelectCover: (String url) {
-              setState(() {
-                _pickedCover = url;
-              });
-            },
-          ),
-          SizedBox(height: height / 60),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: ElevatedButton(
-                    style: ButtonStyle(
-                        elevation: MaterialStateProperty.all<double>(0),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100))),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xff6E4AFF))),
-                    onPressed: () {
-                      Database().updateProject(
-                          _pickedColor,
-                          _authcontroller.user!.uid,
-                          _pickedCover,
-                          widget.projectModel!.projectName,
-                          widget.projectModel!.projectId,
-                          widget.todoModel);
-                    },
-                    child: Text(
-                      'change'.tr,
-                      style: Styles().textStyleProjectChipText,
-                    )),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-    return widget.isCreate == true
-        ? createProject(context)
-        : changeProject(context);
   }
 }

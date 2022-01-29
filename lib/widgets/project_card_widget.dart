@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:todoz_app/controllers/todoController.dart';
+import 'package:todoz_app/controllers/todo_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:todoz_app/utils/styles.dart';
 
 class ProjectCardWidget extends StatefulWidget {
-  final String? projectName;
-  final String? color;
-  final double? height;
-  final double? width;
-  final String? cover;
-  final bool? isCreate;
+  final String projectName;
+  final String color;
+  final double height;
+  final double width;
+  final String cover;
+  final bool isCreate;
 
   const ProjectCardWidget(
       {Key? key,
-      this.color,
-      this.projectName,
-      this.height,
-      this.width,
-      this.cover,
-      this.isCreate})
+      required this.color,
+      required this.projectName,
+      required this.height,
+      required this.width,
+      required this.cover,
+      required this.isCreate})
       : super(key: key);
 
   @override
@@ -29,6 +29,7 @@ class ProjectCardWidget extends StatefulWidget {
 
 class _ProjectCardWidgetState extends State<ProjectCardWidget> {
   late TodoController todoController;
+  late int retrivedColor;
 
   int get howManyDone {
     var listModels = todoController.todos
@@ -39,12 +40,12 @@ class _ProjectCardWidgetState extends State<ProjectCardWidget> {
         listDone.add(item);
       }
     }
-    return widget.height! > 400 ? listDone.length : 2;
+    return widget.height > 400 ? listDone.length : 2;
   }
 
   double get percentage {
     int doneTasks = howManyDone;
-    int allTasks = widget.height! > 400
+    int allTasks = widget.height > 400
         ? todoController.todos
             .where((element) => element!.projectName == widget.projectName)
             .length
@@ -57,27 +58,27 @@ class _ProjectCardWidgetState extends State<ProjectCardWidget> {
   @override
   void initState() {
     todoController = Get.find<TodoController>();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    int retrivedColor = int.parse(widget.color!);
+    retrivedColor = int.parse(widget.color);
     return Column(
       children: [
         AnimatedContainer(
           duration: const Duration(milliseconds: 500),
           padding: const EdgeInsets.fromLTRB(25, 9, 5, 9),
-          height: widget.height! / 2.1,
-          width: widget.width! - 50,
+          height: widget.height / 2.1,
+          width: widget.width - 50,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(35),
               color: Color(retrivedColor).withOpacity(1)),
           child: GetX<TodoController>(
               init: Get.put<TodoController>(TodoController()),
               builder: (TodoController todoController) {
-                if (todoController.isBlank != null &&
-                    todoController.todos.isNotEmpty) {
+                if (todoController.todos.isNotEmpty) {
                   return Stack(
                     alignment: Alignment.centerRight,
                     fit: StackFit.expand,
@@ -90,7 +91,7 @@ class _ProjectCardWidgetState extends State<ProjectCardWidget> {
                             Text(
                                 'numberOfTasks'.trArgs([
                                   howManyDone.toString(),
-                                  widget.height! > 400
+                                  widget.height > 400
                                       ? todoController.todos
                                           .where((element) =>
                                               element!.projectName ==
@@ -101,11 +102,11 @@ class _ProjectCardWidgetState extends State<ProjectCardWidget> {
                                 ]),
                                 style: Styles().textStyleWhiteText),
                             SizedBox(
-                              height: widget.height! / 40,
+                              height: widget.height / 40,
                             ),
                             CircularPercentIndicator(
                               circularStrokeCap: CircularStrokeCap.round,
-                              radius: widget.height! > 400 ? 60 : 50,
+                              radius: widget.height > 400 ? 60 : 50,
                               fillColor: Colors.transparent,
                               backgroundColor: Colors.transparent,
                               animateFromLastPercent: true,
@@ -120,27 +121,24 @@ class _ProjectCardWidgetState extends State<ProjectCardWidget> {
                                                 .toString()
                                                 .substring(0, 4) +
                                             '%',
-                                style: widget.height! > 400
+                                style: widget.height > 400
                                     ? Styles().textStyleProjectChipText
                                     : Styles().textStyleProgressPreview,
                               ),
                               progressColor: Colors.white.withOpacity(0.4),
-                              lineWidth: widget.height! > 400 ? 6.0 : 4.5,
+                              lineWidth: widget.height > 400 ? 6.0 : 4.5,
                               percent: percentage,
                             ),
                             SizedBox(
-                              height: widget.height! / 80,
+                              height: widget.height / 80,
                             ),
                             SizedBox(
-                              width: widget.width! / 3.7,
+                              width: widget.width / 3.7,
                               child: Text(
-                                widget.projectName == '' &&
-                                        widget.isCreate == true
-                                    ? 'newProject'.tr
-                                    : widget.projectName!,
+                                widget.projectName,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
-                                style: widget.height! > 400
+                                style: widget.height > 400
                                     ? Styles().textStyleWhiteBigText
                                     : Styles().textStyleProjectNamePreview,
                                 textAlign: TextAlign.left,
@@ -152,11 +150,9 @@ class _ProjectCardWidgetState extends State<ProjectCardWidget> {
                       Positioned(
                         right: 10,
                         child: SizedBox(
-                          width: widget.height! > 400
-                              ? (widget.width! / 3.5)
-                              : (widget.width! / 3),
+                          width: widget.height > 400 ? 150 : 120,
                           child: SvgPicture.network(
-                            widget.cover!,
+                            widget.cover,
                             alignment: Alignment.centerRight,
                           ),
                         ),
@@ -172,7 +168,7 @@ class _ProjectCardWidgetState extends State<ProjectCardWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(height: widget.height! / 40),
+                            SizedBox(height: widget.height / 40),
                             Text('noTasks'.tr,
                                 style: Styles().textStyleWhiteBigText)
                           ],

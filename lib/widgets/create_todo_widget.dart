@@ -1,24 +1,27 @@
-// ignore_for_file: file_names
-
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:item_selector/item_selector.dart';
-import 'package:todoz_app/controllers/authController.dart';
-import 'package:todoz_app/controllers/projectController.dart';
-import 'package:todoz_app/controllers/todoController.dart';
-import 'package:todoz_app/models/projectModel.dart';
-import 'package:todoz_app/utils/itemSelection.dart';
+import 'package:todoz_app/controllers/auth_controller.dart';
+import 'package:todoz_app/controllers/project_controller.dart';
+import 'package:todoz_app/controllers/todo_controller.dart';
+import 'package:todoz_app/models/project_model.dart';
+import 'package:todoz_app/utils/item_selection.dart';
 import 'package:todoz_app/utils/styles.dart';
-import 'package:todoz_app/widgets/projectChoiceChip.dart';
+import 'package:todoz_app/widgets/project_choice_chip.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:date_time_format/src/date_time_extension_methods.dart';
 
 class CreateTodo extends GetWidget<AuthController> {
-  CreateTodo({Key? key, this.visibility, this.projectModel}) : super(key: key);
+  CreateTodo({Key? key, required this.visibility, this.projectModel})
+      : super(key: key);
 
   final TextEditingController _todoController = TextEditingController();
-  String? chosenProject = '';
-  bool? visibility = true;
+  String? chosenProject;
+  bool visibility;
   ProjectModel? projectModel;
+  DateTime? dateUntil;
+  DateTime? duration;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +100,7 @@ class CreateTodo extends GetWidget<AuthController> {
           ),
           const SizedBox(height: 15),
           Visibility(
-            visible: visibility!,
+            visible: visibility,
             child: Padding(
               padding: const EdgeInsets.only(left: 20),
               child: Text(
@@ -108,7 +111,7 @@ class CreateTodo extends GetWidget<AuthController> {
           ),
           const SizedBox(height: 5),
           Visibility(
-            visible: visibility!,
+            visible: visibility,
             child: GetX<ProjectController>(
               init: Get.put<ProjectController>(ProjectController()),
               builder: (ProjectController projectController) {
@@ -167,6 +170,8 @@ class CreateTodo extends GetWidget<AuthController> {
                                           if (selected == true) {
                                             chosenProject = projectController
                                                 .projects[index]!.projectName;
+                                            projectModel = projectController
+                                                .projects[index];
                                           }
                                           return ProjectChoiceChip(
                                             isSelected: selected,
@@ -198,6 +203,66 @@ class CreateTodo extends GetWidget<AuthController> {
                 padding: const EdgeInsets.only(right: 20),
                 child: ElevatedButton(
                     style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                            const EdgeInsets.fromLTRB(0, 10, 0, 10)),
+                        elevation: MaterialStateProperty.all<double>(50),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(200))),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white)),
+                    onPressed: () async {
+                      dateUntil = await DatePicker.showDateTimePicker(
+                        context,
+                        locale: LocaleType.ru,
+                        currentTime: DateTime.now(),
+                        minTime: DateTime(DateTime.now().year - 1),
+                        maxTime: DateTime(DateTime.now().year + 1),
+                        onConfirm: (date) {
+                          dateUntil = date;
+                        },
+                      );
+                    },
+                    child: const Icon(
+                      EvaIcons.calendarOutline,
+                      size: 25,
+                      color: Colors.black,
+                    )),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: ElevatedButton(
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                            const EdgeInsets.fromLTRB(0, 10, 0, 10)),
+                        elevation: MaterialStateProperty.all<double>(50),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(200))),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white)),
+                    onPressed: () async {
+                      duration = await DatePicker.showTimePicker(
+                        context,
+                        locale: LocaleType.ru,
+                        currentTime: DateTime.now(),
+                        onConfirm: (date) {
+                          duration = date;
+                        },
+                      );
+                    },
+                    child: const Icon(
+                      EvaIcons.clockOutline,
+                      size: 25,
+                      color: Colors.black,
+                    )),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: ElevatedButton(
+                    style: ButtonStyle(
                         elevation: MaterialStateProperty.all<double>(0),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -207,16 +272,17 @@ class CreateTodo extends GetWidget<AuthController> {
                             const Color(0xff6E4AFF))),
                     onPressed: () {
                       TodoController().addTodo(
-                          visibility == true && chosenProject != null
-                              ? chosenProject!
-                              : projectModel!.projectName == null
-                                  ? 'NoProject'
-                                  : projectModel!.projectName,
-                          _todoController,
-                          controller.user!.uid,
-                          projectModel?.projectId == null
+                          projectName:
+                              visibility == true && chosenProject != null
+                                  ? chosenProject!
+                                  : 'NoProject',
+                          controller: _todoController,
+                          uid: controller.user!.uid,
+                          projectId: projectModel == null
                               ? 'NoProject'
-                              : projectModel?.projectId);
+                              : projectModel?.projectId,
+                          dateUntil: dateUntil,
+                          duration: duration);
                     },
                     child: Text(
                       'create'.tr,
