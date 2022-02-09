@@ -13,25 +13,22 @@ class ProjectController extends GetxController {
 
   @override
   onInit() {
-    String uid = Get.find<AuthController>().user!.uid;
-    _projectList.bindStream(Database().getProjects(uid));
+    String _uid = Get.find<AuthController>().user!.uid;
+    _projectList.bindStream(Database().getProjects(_uid));
     super.onInit();
   }
 
-  String getProjectId(TodoModel todoModel) {
-    String projectId;
-    if (todoModel.projectName == 'NoProject') {
-      projectId = 'NoProject';
-    } else {
-      final project = Get.find<ProjectController>();
-      projectId = project.projects
-          .where((element) => element!.projectName == todoModel.projectName)
-          .first!
-          .projectId;
-    }
+  /// Get project's ID for a [TodoModel]
+  static String getProjectId(TodoModel todoModel) {
+    String projectId = Get.find<ProjectController>()
+        .projects
+        .singleWhere(
+            (project) => project!.projectName == todoModel.projectName)!
+        .projectId;
     return projectId;
   }
 
+  /// Adds new [ProjectModel] to [Firestore]'s database
   void addProject(TextEditingController controller, String uid, Color color,
       String projectCover) {
     if (controller.text != "") {
@@ -46,6 +43,7 @@ class ProjectController extends GetxController {
     }
   }
 
+  /// Opens dialog for creating new [ProjectModel]
   void openCreateProject(BuildContext context, ProjectModel? projectModel,
       bool isCreate, List<TodoModel?>? todoModel) {
     showDialog(
@@ -57,7 +55,7 @@ class ProjectController extends GetxController {
                 CreateProjectWidget(
                   projectModel: projectModel,
                   isCreate: isCreate,
-                  todoModel: todoModel,
+                  todoModels: todoModel,
                 )
               ],
             ));

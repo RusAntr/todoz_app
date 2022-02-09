@@ -1,7 +1,15 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ColorPicker extends StatefulWidget {
+  const ColorPicker({
+    Key? key,
+    this.onSelectColor,
+    this.availableColors,
+    this.initialColor,
+  }) : super(key: key);
+
   /// This function sends the selected color to outside
   final Function? onSelectColor;
 
@@ -10,13 +18,6 @@ class ColorPicker extends StatefulWidget {
 
   /// The default picked color
   final Color? initialColor;
-
-  const ColorPicker({
-    Key? key,
-    this.onSelectColor,
-    this.availableColors,
-    this.initialColor,
-  }) : super(key: key);
 
   @override
   State<ColorPicker> createState() => _ColorPickerState();
@@ -33,11 +34,12 @@ class _ColorPickerState extends State<ColorPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final _width = Get.width;
     return SizedBox(
       height: 50,
-      width: width,
+      width: _width,
       child: ListView.builder(
+        shrinkWrap: true,
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
         itemCount: widget.availableColors!.length,
@@ -45,10 +47,10 @@ class _ColorPickerState extends State<ColorPicker> {
           final itemColor = widget.availableColors![index];
           return Padding(
             padding: (index == 0)
-                ? const EdgeInsets.only(left: 15, right: 5)
+                ? const EdgeInsets.only(left: 15.0, right: 5.0)
                 : (index == 6)
-                    ? const EdgeInsets.only(right: 15, left: 5)
-                    : const EdgeInsets.only(left: 5, right: 5),
+                    ? const EdgeInsets.only(right: 15.0, left: 5.0)
+                    : const EdgeInsets.only(left: 5.0, right: 5.0),
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -57,8 +59,8 @@ class _ColorPickerState extends State<ColorPicker> {
                 });
               },
               child: Container(
-                height: 35,
-                width: 35,
+                height: 35.0,
+                width: 35.0,
                 decoration:
                     BoxDecoration(color: itemColor, shape: BoxShape.circle),
                 child: itemColor == _pickedColor

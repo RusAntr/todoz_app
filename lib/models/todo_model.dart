@@ -9,6 +9,7 @@ class TodoModel {
   late Timestamp? dateUntil;
   late Timestamp? duration;
   late int timePassed;
+  late String userId;
 
   TodoModel(
       {required this.content,
@@ -18,7 +19,8 @@ class TodoModel {
       required this.isDone,
       this.dateUntil,
       this.duration,
-      required this.timePassed});
+      required this.timePassed,
+      required this.userId});
 
   TodoModel.fromDocumentSnapshot(DocumentSnapshot documentSnapshot) {
     content = documentSnapshot['content'];
@@ -29,5 +31,6 @@ class TodoModel {
     dateUntil = documentSnapshot['dateUntil'];
     duration = documentSnapshot['duration'];
     timePassed = documentSnapshot['timePassed'];
+    userId = documentSnapshot['userId'];
   }
 }

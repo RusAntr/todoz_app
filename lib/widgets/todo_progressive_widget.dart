@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +51,7 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
         widget.todoModel.isDone,
         widget.uid,
         widget.todoModel.todoId,
-        ProjectController().getProjectId(widget.todoModel),
+        ProjectController.getProjectId(widget.todoModel),
         widget.todoModel.projectName,
         _timePassed);
     _timer.cancel();
@@ -72,12 +71,12 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
           true,
           widget.uid,
           widget.todoModel.todoId,
-          ProjectController().getProjectId(widget.todoModel),
+          ProjectController.getProjectId(widget.todoModel),
           widget.todoModel.projectName,
           widget.todoModel.timePassed);
     } else if (direction == SwipeDirection.startToEnd) {
       Database().deleteTodo(widget.todoModel.todoId, widget.uid,
-          ProjectController().getProjectId(widget.todoModel));
+          ProjectController.getProjectId(widget.todoModel));
     }
   }
 
@@ -105,7 +104,7 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
   @override
   Widget build(BuildContext context) {
     return SwipeableTile.swipeToTiggerCard(
-      swipeThreshold: 0.2,
+      swipeThreshold: .2,
       direction: SwipeDirection.horizontal,
       key: Key(widget.todoModel.todoId),
       behavior: HitTestBehavior.opaque,
@@ -123,7 +122,7 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
           return Container(
               padding: const EdgeInsets.only(left: 25),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(25),
                 color: Colors.red,
               ),
               alignment: Alignment.centerLeft,
@@ -134,19 +133,17 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
         return Container();
       },
       color: Colors.white,
-      borderRadius: 25,
-      horizontalPadding: 15,
-      verticalPadding: 10,
-      onSwiped: (SwipeDirection direction) {
-        onSwipe(direction);
-      },
+      borderRadius: 25.0,
+      horizontalPadding: 15.0,
+      verticalPadding: 10.0,
+      onSwiped: (SwipeDirection direction) => onSwipe(direction),
       shadow: BoxShadow(
-          color: Colors.black.withOpacity(.05),
-          blurRadius: 10,
-          offset: const Offset(0, 5)),
+          color: Colors.black.withOpacity(.03),
+          blurRadius: 10.0,
+          offset: const Offset(.0, 10.0)),
       child: Padding(
         padding: const EdgeInsets.only(
-            right: 25.0, left: 25.0, bottom: 5.0, top: 5.0),
+            right: 25.0, left: 25.0, bottom: 10.0, top: 10.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -156,17 +153,17 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
                 Text(widget.todoModel.projectName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Styles().textStyleTodoCardProject),
+                    style: Styles.projectNameProgressive),
                 const SizedBox(height: 5),
                 SizedBox(
-                  height: widget.todoModel.content.length <= 24 ? 30 : 60,
-                  width: 250,
+                  height: widget.todoModel.content.length <= 35 ? 30 : 60,
+                  width: 250.0,
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     child: Text(
                       widget.todoModel.content,
-                      style: Styles().progressWidgetContent,
+                      style: Styles.todoContentProgressive,
                     ),
                   ),
                 ),
@@ -177,11 +174,11 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
                     Text(
                       TodoController().toDoProgressDuration(_duration) +
                           '  |  ',
-                      style: Styles().timePassedVsDuration,
+                      style: Styles.timePassedVsDuration,
                     ),
                     Text(
                       TodoController().howMuchTimePassed(_timePassed),
-                      style: Styles().timePassedVsDuration,
+                      style: Styles.timePassedVsDuration,
                     ),
                     const SizedBox(width: 5),
                   ],
@@ -226,7 +223,7 @@ class TodoProgressiveWidgetState extends State<TodoProgressiveWidget>
                           .round()
                           .toString() +
                       '%',
-              style: Styles().textStyleBlackSmallText,
+              style: Styles.textStyleBlackSmallText,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 5),

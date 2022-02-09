@@ -15,18 +15,22 @@ class TodoController extends GetxController {
 
   @override
   onInit() {
-    String uid = Get.find<AuthController>().user!.uid;
-    _todoList.bindStream(Database().getAllTodos(uid));
+    String _uid = Get.find<AuthController>().user!.uid;
+    _todoList.bindStream(Database().getAllTodos(_uid));
     super.onInit();
   }
 
-  List<TodoModel> relevantTodoModels(TodoController todoController,
+  void clear() {
+    _todoList.value = [];
+  }
+
+  /// A list of [TodoModel]'s for [TodoCard]
+  List<TodoModel> relevantTodoModels(
       DateTime _date, int _pageIndex, bool _showAllTodos) {
-    List<TodoModel?> models = todoController.todos;
     List<TodoModel> retVal = [];
     int yesterday = _date.subtract(const Duration(days: 1)).day;
     int tomorrow = _date.add(const Duration(days: 1)).day;
-    for (var item in models) {
+    for (var item in todos) {
       if (_pageIndex == 0 &&
           item!.dateUntil != null &&
           item.dateUntil!.toDate().day == yesterday &&
@@ -49,6 +53,7 @@ class TodoController extends GetxController {
     return retVal;
   }
 
+  /// Adds new [TodoModel] to [Firestore]'s database
   void addTodo({
     required String projectName,
     required TextEditingController controller,
@@ -60,7 +65,7 @@ class TodoController extends GetxController {
     if (controller.text != "") {
       Database().addTodo(
           projectId: projectId,
-          projectName: projectName == '' ? 'NoProject' : projectName,
+          projectName: projectName,
           content: controller.text,
           dateUntil: dateUntil,
           duration: duration,
@@ -72,6 +77,7 @@ class TodoController extends GetxController {
     }
   }
 
+  /// Opening a dialog to create new [TodoModel]
   void openCreateTodo(
       BuildContext context, bool visible, ProjectModel? projectModel) {
     showDialog(
@@ -85,6 +91,7 @@ class TodoController extends GetxController {
             ));
   }
 
+  /// Counting and formatting date until tasks needs to be done for [TodoCard]
   String countUntilTime(Timestamp due) {
     String outputDate;
     DateTime dateDue = due.toDate();
@@ -112,6 +119,22 @@ class TodoController extends GetxController {
     return outputDate;
   }
 
+  /// Number of all tasks for [ProgressWidget]
+  int numberOfAllTasks(bool areAllTasks, DateTime untilDay) {
+    List<TodoModel> retVal = [];
+    for (var item in todos) {
+      if (item!.dateUntil != null &&
+          item.dateUntil!.toDate().day == untilDay.day &&
+          areAllTasks == false) {
+        retVal.add(item);
+      } else if (areAllTasks == true) {
+        retVal.add(item);
+      }
+    }
+    return retVal.length;
+  }
+
+  /// Formatting duration time setted for a task
   String toDoProgressDuration(Timestamp duration) {
     String outputDate = '';
     DateTime dateDue = duration.toDate();
@@ -144,25 +167,25 @@ class TodoController extends GetxController {
     return outputDate;
   }
 
-  List howManyTaskDone(
-      TodoController todoController, DateTime untilDay, bool getAll) {
-    List<TodoModel?> listModels = todoController.todos;
-    var listDone = [];
-    for (var item in listModels) {
+  /// Number of done tasks
+  int howManyTasksDone(DateTime? untilDay, bool getAll) {
+    List<TodoModel> retVal = [];
+    for (var item in todos) {
       if (item!.dateUntil != null && getAll == false) {
         if (item.isDone == true &&
-            item.dateUntil!.toDate().day == untilDay.day) {
-          listDone.add(item);
+            item.dateUntil!.toDate().day == untilDay!.day) {
+          retVal.add(item);
         }
       } else if (getAll == true) {
         if (item.isDone == true) {
-          listDone.add(item);
+          retVal.add(item);
         }
       }
     }
-    return listDone;
+    return retVal.length;
   }
 
+  /// Formatting seconds to minutes & hours
   String howMuchTimePassed(int seconds) {
     String _timePassed = '';
     int _hour = (seconds ~/ 3600).toInt();
@@ -178,25 +201,25 @@ class TodoController extends GetxController {
     return _timePassed;
   }
 
-  double percentageOfTasks(
-      TodoController todoController, DateTime untilDay, bool getAll) {
-    int doneTasks = howManyTaskDone(todoController, untilDay, getAll).length;
-    List<TodoModel?> listModels = todoController.todos;
-    var listAll = [];
-    for (var item in listModels) {
+  /// Counting percentage of done tasks vs. undone tasks for [ProgressWidget]
+  double percentageOfTasks(DateTime untilDay, bool getAll) {
+    int doneTasks = howManyTasksDone(untilDay, getAll);
+    List<TodoModel> retVal = [];
+    for (var item in todos) {
       if (item!.dateUntil != null &&
           item.dateUntil!.toDate().day == untilDay.day &&
           getAll == false) {
-        listAll.add(item);
+        retVal.add(item);
       } else if (getAll == true) {
-        listAll.add(item);
+        retVal.add(item);
       }
     }
-    int allTasks = listAll.length;
+    int allTasks = retVal.length;
     double result = (doneTasks / allTasks) * 100;
     return result;
   }
 
+  /// Counting percentage of passed time vs full duration of a task for [TodoProgressiveWidget]
   double percentageOfTimePassed(Timestamp duration, int timePassed) {
     DateTime _dateDue = duration.toDate();
     Duration _timeUntil = _dateDue

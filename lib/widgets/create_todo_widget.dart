@@ -1,34 +1,71 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:item_selector/item_selector.dart';
 import 'package:todoz_app/controllers/auth_controller.dart';
 import 'package:todoz_app/controllers/project_controller.dart';
 import 'package:todoz_app/controllers/todo_controller.dart';
 import 'package:todoz_app/models/project_model.dart';
-import 'package:todoz_app/utils/item_selection.dart';
 import 'package:todoz_app/utils/styles.dart';
-import 'package:todoz_app/widgets/project_choice_chip.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:date_time_format/src/date_time_extension_methods.dart';
+import 'package:todoz_app/widgets/project_picker.dart';
 
-class CreateTodo extends GetWidget<AuthController> {
-  CreateTodo({Key? key, required this.visibility, this.projectModel})
+class CreateTodo extends StatefulWidget {
+  const CreateTodo({Key? key, required this.visibility, this.projectModel})
       : super(key: key);
+  final bool visibility;
+  final ProjectModel? projectModel;
 
-  final TextEditingController _todoController = TextEditingController();
-  String? chosenProject;
-  bool visibility;
-  ProjectModel? projectModel;
-  DateTime? dateUntil;
-  DateTime? duration;
+  @override
+  State<CreateTodo> createState() => _CreateTodoState();
+}
+
+class _CreateTodoState extends State<CreateTodo> {
+  ProjectModel? _pickedProject;
+  ProjectModel? _initialProject;
+  DateTime? _dateUntil;
+  DateTime? _duration;
+  final TextEditingController _textEditingController = TextEditingController();
+  late AuthController _authController;
+
+  List<ProjectModel?> get _projectModels {
+    ProjectController projectController = Get.find<ProjectController>();
+    List<ProjectModel?> projects = projectController.projects;
+    return projects;
+  }
+
+  LocaleType get localeType {
+    if (Get.deviceLocale == const Locale('en', 'US')) {
+      return LocaleType.en;
+    } else if (Get.deviceLocale == const Locale('ru', 'RU')) {
+      return LocaleType.ru;
+    } else if (Get.deviceLocale == const Locale('zh', 'CN')) {
+      return LocaleType.zh;
+    } else {
+      return LocaleType.en;
+    }
+  }
+
+  @override
+  void initState() {
+    if (_projectModels.isNotEmpty) {
+      _pickedProject = _projectModels[0];
+    }
+    _authController = Get.find<AuthController>();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final selection = RectSelection(1);
+    final width = Get.width;
     return Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +73,7 @@ class CreateTodo extends GetWidget<AuthController> {
           Row(
             children: [
               const SizedBox(
-                width: 20,
+                width: 20.0,
               ),
               const Spacer(
                 flex: 2,
@@ -44,153 +81,118 @@ class CreateTodo extends GetWidget<AuthController> {
               Center(
                 child: Text(
                   'newTask'.tr,
-                  style: Styles().textStyleAddTaskText,
+                  style: Styles.textStyleAddTaskText,
                 ),
               ),
               const Spacer(flex: 1),
               Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(right: 15.0),
                 child: TextButton(
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            const EdgeInsets.only(right: 5, left: 5)),
-                        overlayColor: MaterialStateProperty.all<Color>(
+                        minimumSize:
+                            MaterialStateProperty.all(const Size(20.0, 20.0)),
+                        overlayColor: MaterialStateProperty.all(
                             Colors.black.withOpacity(0.1)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(200))),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xffF2F4F5))),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0))),
+                        backgroundColor:
+                            MaterialStateProperty.all(const Color(0xffF2F4F5))),
                     onPressed: () {
                       Get.back();
                     },
-                    child: const Icon(
+                    child: Icon(
                       EvaIcons.close,
-                      color: Colors.black,
-                      size: 25,
+                      color: Colors.black.withOpacity(0.5),
+                      size: 20.0,
                     )),
               ),
             ],
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 5.0),
           Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
+            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
             child: TextField(
-              controller: _todoController,
+              controller: _textEditingController,
               decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(17),
+                  contentPadding: const EdgeInsets.all(17.0),
                   focusedBorder: const OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                          BorderSide(color: Colors.transparent, width: .0),
+                      borderRadius: BorderRadius.all(Radius.circular(100.0))),
                   enabledBorder: const OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                          BorderSide(color: Colors.transparent, width: .0),
+                      borderRadius: BorderRadius.all(Radius.circular(100.0))),
                   filled: true,
                   fillColor: const Color(0xFFEEF1F7),
                   border: const OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                          BorderSide(color: Colors.transparent, width: .0),
+                      borderRadius: BorderRadius.all(Radius.circular(100.0))),
                   hintText: 'titleHint'.tr,
-                  hintStyle: const TextStyle(fontSize: 16)),
+                  hintStyle: const TextStyle(fontSize: 16.0)),
             ),
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 15.0),
           Visibility(
-            visible: visibility,
+            visible: widget.visibility,
             child: Padding(
-              padding: const EdgeInsets.only(left: 20),
+              padding: const EdgeInsets.only(left: 20.0),
               child: Text(
                 'addToProject'.tr,
-                style: Styles().textStyleBlackSmallText,
+                style: Styles.textStyleBlackSmallText,
               ),
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 10.0),
           Visibility(
-            visible: visibility,
+            visible: widget.visibility,
             child: GetX<ProjectController>(
-              init: Get.put<ProjectController>(ProjectController()),
+              init: Get.find<ProjectController>(),
               builder: (ProjectController projectController) {
-                if (projectController.isBlank != true &&
-                    projectController.projects.isNotEmpty) {
+                if (projectController.projects.isNotEmpty) {
+                  _initialProject = _projectModels[0];
                   return SizedBox(
-                    key: key,
-                    height: 110,
+                    height: 100.0,
                     width: width,
-                    child: ItemSelectionController(
-                        onSelectionStart: selection.start,
-                        selection: selection,
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 15),
-                              GestureDetector(
-                                onTap: () => ProjectController()
-                                    .openCreateProject(
-                                        context, null, true, null),
-                                child: Container(
-                                  padding: const EdgeInsets.all(15),
-                                  height: 80,
-                                  width: 85,
-                                  decoration: BoxDecoration(
-                                      boxShadow: [
-                                        BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.08),
-                                            offset: const Offset(0, 8),
-                                            blurRadius: 5,
-                                            spreadRadius: 0)
-                                      ],
-                                      borderRadius: BorderRadius.circular(25),
-                                      color: Colors.grey[500]),
-                                  child: Center(
-                                      child: Icon(
-                                    EvaIcons.plusSquare,
-                                    size: 30,
-                                    color: Colors.white.withOpacity(0.5),
-                                  )),
-                                ),
-                              ),
-                              ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const BouncingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: projectController.projects.length,
-                                  itemBuilder: (_, index) {
-                                    return ItemSelectionBuilder(
-                                        index: index,
-                                        builder: (BuildContext context,
-                                            int index, bool selected) {
-                                          if (selected == true) {
-                                            chosenProject = projectController
-                                                .projects[index]!.projectName;
-                                            projectModel = projectController
-                                                .projects[index];
-                                          }
-                                          return ProjectChoiceChip(
-                                            isSelected: selected,
-                                            projectModel: projectController
-                                                .projects[index],
-                                          );
-                                        });
-                                  }),
-                              const SizedBox(width: 15),
-                            ],
-                          ),
-                        )),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      child: ProjectPicker(
+                        onSelectProject: (ProjectModel model) {
+                          setState(() {
+                            _pickedProject = model;
+                          });
+                        },
+                        initialProject: _initialProject,
+                        availableProjects: _projectModels,
+                      ),
+                    ),
                   );
                 } else {
-                  return Center(
-                    child: Text(
-                      'noProjects'.tr,
-                      style: Styles().textStyleNoProjects,
-                    ),
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 15.0),
+                      GestureDetector(
+                        onTap: () => ProjectController()
+                            .openCreateProject(context, null, true, null),
+                        child: Container(
+                          padding: const EdgeInsets.all(15.0),
+                          height: 90.0,
+                          width: 95.0,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: Colors.grey[500]),
+                          child: Center(
+                              child: Icon(
+                            EvaIcons.plusSquare,
+                            size: 30.0,
+                            color: Colors.white.withOpacity(0.5),
+                          )),
+                        ),
+                      ),
+                    ],
                   );
                 }
               },
@@ -200,97 +202,115 @@ class CreateTodo extends GetWidget<AuthController> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(right: 10.0),
                 child: ElevatedButton(
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsets>(
-                            const EdgeInsets.fromLTRB(0, 10, 0, 10)),
-                        elevation: MaterialStateProperty.all<double>(50),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(200))),
+                        elevation: MaterialStateProperty.all(16.0),
+                        shadowColor: MaterialStateProperty.all(
+                            Colors.black.withOpacity(0.2)),
+                        padding: MaterialStateProperty.all(
+                            const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0)),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0))),
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white)),
+                            MaterialStateProperty.all(Colors.white)),
                     onPressed: () async {
-                      dateUntil = await DatePicker.showDateTimePicker(
+                      _dateUntil = await DatePicker.showDateTimePicker(
                         context,
-                        locale: LocaleType.ru,
+                        locale: localeType,
                         currentTime: DateTime.now(),
+                        theme: DatePickerTheme(itemStyle: Styles.dateTimeItem),
                         minTime: DateTime(DateTime.now().year - 1),
                         maxTime: DateTime(DateTime.now().year + 1),
                         onConfirm: (date) {
-                          dateUntil = date;
+                          _dateUntil = date;
                         },
                       );
                     },
-                    child: const Icon(
-                      EvaIcons.calendarOutline,
-                      size: 25,
-                      color: Colors.black,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          EvaIcons.calendarOutline,
+                          size: 15.0,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(width: 5.0),
+                        Text('date'.tr, style: Styles.dateTimeItem),
+                      ],
                     )),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(right: 10.0),
                 child: ElevatedButton(
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsets>(
-                            const EdgeInsets.fromLTRB(0, 10, 0, 10)),
-                        elevation: MaterialStateProperty.all<double>(50),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(200))),
+                        elevation: MaterialStateProperty.all(16.0),
+                        shadowColor: MaterialStateProperty.all(
+                            Colors.black.withOpacity(0.2)),
+                        padding: MaterialStateProperty.all(
+                            const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0)),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0))),
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white)),
+                            MaterialStateProperty.all(Colors.white)),
                     onPressed: () async {
-                      duration = await DatePicker.showTimePicker(
+                      _duration = await DatePicker.showTimePicker(
                         context,
-                        locale: LocaleType.ru,
-                        currentTime: DateTime.now(),
+                        theme: DatePickerTheme(itemStyle: Styles.dateTimeItem),
+                        locale: localeType,
+                        currentTime:
+                            DateTime(DateTime.now().year, 0, 0, 0, 0, 0, 0, 0),
                         onConfirm: (date) {
-                          duration = date;
+                          _duration = date;
                         },
                       );
                     },
-                    child: const Icon(
-                      EvaIcons.clockOutline,
-                      size: 25,
-                      color: Colors.black,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          EvaIcons.clockOutline,
+                          size: 15.0,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(width: 5.0),
+                        Text('duration'.tr, style: Styles.dateTimeItem),
+                      ],
                     )),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(right: 15.0),
                 child: ElevatedButton(
                     style: ButtonStyle(
-                        elevation: MaterialStateProperty.all<double>(0),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100))),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xff6E4AFF))),
+                        elevation: MaterialStateProperty.all(0.0),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0))),
+                        backgroundColor:
+                            MaterialStateProperty.all(const Color(0xff6E4AFF))),
                     onPressed: () {
                       TodoController().addTodo(
-                          projectName:
-                              visibility == true && chosenProject != null
-                                  ? chosenProject!
-                                  : 'NoProject',
-                          controller: _todoController,
-                          uid: controller.user!.uid,
-                          projectId: projectModel == null
-                              ? 'NoProject'
-                              : projectModel?.projectId,
-                          dateUntil: dateUntil,
-                          duration: duration);
+                          projectName: widget.visibility == true
+                              ? _pickedProject!.projectName
+                              : widget.projectModel!.projectName,
+                          controller: _textEditingController,
+                          uid: _authController.user!.uid,
+                          projectId: widget.visibility == true
+                              ? _pickedProject!.projectId
+                              : widget.projectModel!.projectId,
+                          dateUntil:
+                              _dateUntil.isBlank == true ? null : _dateUntil,
+                          duration: _duration == null ||
+                                  (_duration!.hour == 0 &&
+                                      _duration!.minute == 0 &&
+                                      _duration!.second == 0)
+                              ? null
+                              : _duration);
                     },
                     child: Text(
                       'create'.tr,
-                      style: Styles().textStyleProjectChipText,
+                      style: Styles.textStyleProjectChipText,
                     )),
               ),
             ],
-          )
+          ),
         ],
       ),
     );

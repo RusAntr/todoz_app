@@ -9,18 +9,18 @@ import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/styles.dart';
 import 'package:todoz_app/widgets/color_picker.dart';
 import 'package:todoz_app/widgets/cover_picker.dart';
-import 'package:todoz_app/widgets/project_card_widget.dart';
+import 'package:todoz_app/widgets/project_preview.dart';
 
 class CreateProjectWidget extends StatefulWidget {
   const CreateProjectWidget(
       {Key? key,
       this.projectModel,
       required this.isCreate,
-      required this.todoModel})
+      required this.todoModels})
       : super(key: key);
   final ProjectModel? projectModel;
   final bool isCreate;
-  final List<TodoModel?>? todoModel;
+  final List<TodoModel?>? todoModels;
 
   @override
   State<CreateProjectWidget> createState() => _CreateProjectWidgetState();
@@ -54,11 +54,11 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
           _pickedCover,
           _projectName,
           widget.projectModel!.projectId,
-          widget.todoModel);
+          widget.todoModels);
     }
   }
 
-  static const List<Color> colors = [
+  static const List<Color> _colors = [
     Color(0xffF7AD78),
     Color(0xff78A3F7),
     Color(0xffC790FF),
@@ -68,7 +68,7 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
     Color(0xffFD84B7),
   ];
 
-  static const List<String> urlImages = [
+  static const List<String> _urlImages = [
     'https://firebasestorage.googleapis.com/v0/b/todoz-3aee8.appspot.com/o/project_covers%2Fappreciation_project.svg?alt=media&token=adb7e417-a4a8-4922-a096-d1ae1d182248',
     'https://firebasestorage.googleapis.com/v0/b/todoz-3aee8.appspot.com/o/project_covers%2Fastronaut_project.svg?alt=media&token=19ef5815-28d8-4efb-8637-51239a131819',
     'https://firebasestorage.googleapis.com/v0/b/todoz-3aee8.appspot.com/o/project_covers%2Fbuilding_project.svg?alt=media&token=18c65323-f725-4ee5-83f6-a6cd0f8646e9',
@@ -98,10 +98,10 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
         ? 'newProject'.tr
         : widget.projectModel!.projectName;
     _pickedColor = widget.isCreate == true
-        ? colors[0]
+        ? _colors[0]
         : Color(int.parse(widget.projectModel!.color));
     _pickedCover = widget.isCreate == true
-        ? urlImages[0]
+        ? _urlImages[0]
         : widget.projectModel!.projectCover;
     super.initState();
   }
@@ -114,10 +114,11 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    double height = Get.height;
+    double width = Get.width;
     return Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35.0)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +126,7 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
           Row(
             children: [
               const SizedBox(
-                width: 20,
+                width: 20.0,
               ),
               const Spacer(
                 flex: 2,
@@ -133,85 +134,84 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
               Center(
                 child: Text(
                   widget.isCreate == true ? 'newProject'.tr : 'change'.tr,
-                  style: Styles().textStyleAddTaskText,
+                  style: Styles.textStyleAddTaskText,
                 ),
               ),
               const Spacer(flex: 1),
               Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(right: 15.0),
                 child: TextButton(
                     style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            const EdgeInsets.only(right: 5, left: 5)),
-                        overlayColor: MaterialStateProperty.all<Color>(
+                        minimumSize:
+                            MaterialStateProperty.all(const Size(20.0, 20.0)),
+                        padding: MaterialStateProperty.all(
+                            const EdgeInsets.all(5.0)),
+                        overlayColor: MaterialStateProperty.all(
                             Colors.black.withOpacity(0.1)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(200))),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xffF2F4F5))),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0))),
+                        backgroundColor:
+                            MaterialStateProperty.all(const Color(0xffF2F4F5))),
                     onPressed: () {
                       Get.back();
                     },
-                    child: const Icon(
+                    child: Icon(
                       EvaIcons.close,
-                      color: Colors.black,
-                      size: 25,
+                      color: Colors.black.withOpacity(0.5),
+                      size: 20.0,
                     )),
               ),
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
-            child: ProjectCardWidget(
-              isCreate: true,
-              cover: _pickedCover,
-              height: height / 2,
-              width: width - 10,
-              color: _pickedColor.value.toString(),
-              projectName: _projectName,
-            ),
-          ),
+              padding:
+                  const EdgeInsets.only(left: 15.0, right: 15.0, bottom: 20.0),
+              child: ProjectPreviewWidget(
+                  projectName: _projectName,
+                  color: _pickedColor.value.toString(),
+                  height: 180,
+                  width: width,
+                  cover: _pickedCover,
+                  isCreate: widget.isCreate)),
           Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15),
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0),
             child: TextField(
               onChanged: (value) => setState(() {
                 _projectName = _textEditingController.text;
               }),
               controller: _textEditingController,
               decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(17),
+                  contentPadding: const EdgeInsets.all(17.0),
                   focusedBorder: const OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
+                          BorderSide(color: Colors.transparent, width: .0),
                       borderRadius: BorderRadius.all(Radius.circular(100))),
                   enabledBorder: const OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                          BorderSide(color: Colors.transparent, width: .0),
+                      borderRadius: BorderRadius.all(Radius.circular(50.0))),
                   filled: true,
                   fillColor: const Color(0xFFEEF1F7),
                   border: const OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: Colors.transparent, width: 0),
-                      borderRadius: BorderRadius.all(Radius.circular(100))),
+                          BorderSide(color: Colors.transparent, width: .0),
+                      borderRadius: BorderRadius.all(Radius.circular(50.0))),
                   hintText: 'titleHint'.tr,
-                  hintStyle: const TextStyle(fontSize: 16)),
+                  hintStyle: const TextStyle(fontSize: 16.0)),
             ),
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 15.0),
           Padding(
-            padding: const EdgeInsets.only(left: 15),
+            padding: const EdgeInsets.only(left: 15.0),
             child: Text(
               'chooseColor'.tr,
-              style: Styles().textStyleBlackSmallText,
+              style: Styles.textStyleBlackSmallText,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 5, bottom: 5),
+            padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
             child: ColorPicker(
-              availableColors: colors,
+              availableColors: _colors,
               initialColor: _pickedColor,
               onSelectColor: (Color value) {
                 setState(() {
@@ -221,14 +221,14 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15),
+            padding: const EdgeInsets.only(left: 15.0),
             child: Text(
               'chooseCover'.tr,
-              style: Styles().textStyleBlackSmallText,
+              style: Styles.textStyleBlackSmallText,
             ),
           ),
           CoverPicker(
-            availableCovers: urlImages,
+            availableCovers: _urlImages,
             initialCover: _pickedCover,
             onSelectCover: (String url) {
               setState(() {
@@ -238,43 +238,47 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
           ),
           SizedBox(height: height / 60),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               widget.isCreate == false
                   ? Padding(
-                      padding: const EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(right: 20.0),
                       child: ElevatedButton(
                         style: ButtonStyle(
-                            elevation: MaterialStateProperty.all<double>(0),
-                            shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
+                            shadowColor: MaterialStateProperty.all(
+                                Colors.black.withOpacity(0.2)),
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.all(10.0)),
+                            minimumSize: MaterialStateProperty.all(
+                                const Size(20.0, 20.0)),
+                            elevation: MaterialStateProperty.all(5.0),
+                            shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100))),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                const Color(0xff6E4AFF).withOpacity(0.3))),
+                                    borderRadius: BorderRadius.circular(50.0))),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.white)),
                         onPressed: () {
-                          setState(() {
-                            Database().deleteProject(
-                                _authcontroller.user!.uid,
-                                widget.projectModel!.projectId,
-                                widget.todoModel);
-                          });
+                          deleteProject();
                         },
-                        child: const Icon(EvaIcons.trash2Outline),
+                        child: const Icon(
+                          EvaIcons.trash2,
+                          size: 20.0,
+                          color: Colors.red,
+                        ),
                       ),
                     )
                   : Container(),
               Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(right: 20.0),
                 child: ElevatedButton(
                     style: ButtonStyle(
-                        elevation: MaterialStateProperty.all<double>(0),
+                        elevation: MaterialStateProperty.all(.0),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100))),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xff6E4AFF))),
+                                    borderRadius: BorderRadius.circular(50.0))),
+                        backgroundColor:
+                            MaterialStateProperty.all(const Color(0xff6E4AFF))),
                     onPressed: () {
                       setState(() {
                         createOrChange();
@@ -282,7 +286,7 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
                     },
                     child: Text(
                       widget.isCreate == true ? 'create'.tr : 'change'.tr,
-                      style: Styles().textStyleProjectChipText,
+                      style: Styles.textStyleProjectChipText,
                     )),
               ),
             ],
@@ -290,5 +294,13 @@ class _CreateProjectWidgetState extends State<CreateProjectWidget> {
         ],
       ),
     );
+  }
+
+  Future<void> deleteProject() async {
+    Get.back();
+    Get.back();
+    await Future.delayed(const Duration(seconds: 1));
+    Database().deleteProject(_authcontroller.user!.uid,
+        widget.projectModel!.projectId, widget.todoModels);
   }
 }

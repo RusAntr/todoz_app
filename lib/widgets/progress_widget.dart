@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:get/get.dart';
 import 'package:todoz_app/controllers/todo_controller.dart';
-import 'package:todoz_app/models/todo_model.dart';
 import 'package:todoz_app/utils/styles.dart';
 
 class ProgressWidget extends StatefulWidget {
@@ -22,21 +21,7 @@ class ProgressWidget extends StatefulWidget {
 }
 
 class _ProgressWidgetState extends State<ProgressWidget> {
-  String numberOfTasks(TodoController todoController, DateTime untilDay) {
-    List<TodoModel?> listModels = todoController.todos;
-    var listAll = [];
-    for (var item in listModels) {
-      if (item!.dateUntil != null &&
-          item.dateUntil!.toDate().day == untilDay.day &&
-          widget.areAllTasks == false) {
-        listAll.add(item);
-      } else if (widget.areAllTasks == true) {
-        listAll.add(item);
-      }
-    }
-    return listAll.length.toString();
-  }
-
+  /// Formatting date to be more readable
   String get dateText {
     String dateText = '';
     if (widget.areAllTasks == false) {
@@ -49,8 +34,8 @@ class _ProgressWidgetState extends State<ProgressWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = Get.height;
+    final width = Get.width;
     return Padding(
       padding: const EdgeInsets.only(right: 15, left: 15),
       child: Container(
@@ -63,12 +48,10 @@ class _ProgressWidgetState extends State<ProgressWidget> {
         child: GetX<TodoController>(
             init: Get.put<TodoController>(TodoController()),
             builder: (TodoController todoController) {
-              var percentage = TodoController().percentageOfTasks(
-                  todoController, widget.dateTime, widget.areAllTasks);
-              var howManyDone = TodoController()
-                  .howManyTaskDone(
-                      todoController, widget.dateTime, widget.areAllTasks)
-                  .length;
+              var percentage = todoController.percentageOfTasks(
+                  widget.dateTime, widget.areAllTasks);
+              var howManyDone = todoController.howManyTasksDone(
+                  widget.dateTime, widget.areAllTasks);
               if (todoController.todos.isNotEmpty) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -80,18 +63,20 @@ class _ProgressWidgetState extends State<ProgressWidget> {
                       children: [
                         Text(
                           dateText,
-                          style: Styles().textStyleWhiteText,
+                          style: Styles.textStyleWhiteText,
                         ),
                         SizedBox(height: height / 40),
                         Text(
                             percentage.isNaN == false
                                 ? 'numberOfTasks'.trArgs([
                                     howManyDone.toString(),
-                                    numberOfTasks(
-                                        todoController, widget.dateTime)
+                                    todoController
+                                        .numberOfAllTasks(
+                                            widget.areAllTasks, widget.dateTime)
+                                        .toString()
                                   ])
                                 : 'noTasks'.tr,
-                            style: Styles().textStyleWhiteBigText)
+                            style: Styles.doneVsUndoneProgressWidget),
                       ],
                     ),
                     CircularPercentIndicator(
@@ -108,7 +93,7 @@ class _ProgressWidgetState extends State<ProgressWidget> {
                             : (percentage == 100)
                                 ? '100%'
                                 : percentage.toString().substring(0, 4) + '%',
-                        style: Styles().textStyleProgress,
+                        style: Styles.textStyleProgress,
                       ),
                       progressColor: const Color(0xFF5430E5),
                       lineWidth: 7.0,
@@ -127,11 +112,11 @@ class _ProgressWidgetState extends State<ProgressWidget> {
                         children: [
                           Text(
                             widget.day.tr + widget.dateTime.format('j.m Y'),
-                            style: Styles().textStyleWhiteText,
+                            style: Styles.textStyleWhiteText,
                           ),
                           SizedBox(height: height / 40),
                           Text('noTasks'.tr,
-                              style: Styles().textStyleWhiteBigText)
+                              style: Styles.doneVsUndoneProgressWidget)
                         ],
                       ),
                     ]);

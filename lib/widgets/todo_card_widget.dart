@@ -9,23 +9,24 @@ import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/styles.dart';
 
 class TodoCard extends StatefulWidget {
-  final String uid;
-  final TodoModel todoModel;
   const TodoCard({Key? key, required this.todoModel, required this.uid})
       : super(key: key);
+
+  final String uid;
+  final TodoModel todoModel;
 
   @override
   State<TodoCard> createState() => _TodoCardState();
 }
 
 class _TodoCardState extends State<TodoCard> {
-  late final Timer timer;
-  late bool showDateUntil;
+  late final Timer _timer;
+  late bool _showDateUntil;
 
   @override
   void initState() {
-    showDateUntil = false;
-    timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _showDateUntil = false;
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
       setState(() {});
     });
     super.initState();
@@ -33,7 +34,7 @@ class _TodoCardState extends State<TodoCard> {
 
   @override
   void dispose() {
-    timer.cancel();
+    _timer.cancel();
     super.dispose();
   }
 
@@ -48,28 +49,30 @@ class _TodoCardState extends State<TodoCard> {
     return correctFormatDate;
   }
 
+  void updateTodo() {
+    Database().updateTodo(
+        widget.todoModel.isDone == false ? true : false,
+        widget.uid,
+        widget.todoModel.todoId,
+        ProjectController.getProjectId(widget.todoModel),
+        widget.todoModel.projectName,
+        widget.todoModel.timePassed);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
     return Row(
       children: [
         const SizedBox(width: 15),
         GestureDetector(
           onLongPress: () {
-            Database().updateTodo(
-                widget.todoModel.isDone == false ? true : false,
-                widget.uid,
-                widget.todoModel.todoId,
-                ProjectController().getProjectId(widget.todoModel),
-                widget.todoModel.projectName,
-                widget.todoModel.timePassed);
+            updateTodo();
           },
           child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 9),
-              height: height / 5,
-              width: width / 2.8,
+              padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 9.0),
+              height: 150.0,
+              width: 160.0,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                   color: widget.todoModel.isDone == true
@@ -81,25 +84,25 @@ class _TodoCardState extends State<TodoCard> {
                 children: [
                   Text(
                     widget.todoModel.projectName,
-                    style: Styles().textStyleTodoCardProject,
+                    style: Styles.projectNameTodoCard,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   Text(
                     widget.todoModel.content.toString(),
                     style: widget.todoModel.isDone == true
-                        ? Styles().textStyleToDoDoneText
-                        : Styles().textStyleToDoUndoneText,
+                        ? Styles.textStyleToDoDoneText
+                        : Styles.textStyleToDoUndoneText,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        if (showDateUntil == true) {
-                          showDateUntil = false;
-                        } else if (showDateUntil == false) {
-                          showDateUntil = true;
+                        if (_showDateUntil == true) {
+                          _showDateUntil = false;
+                        } else if (_showDateUntil == false) {
+                          _showDateUntil = true;
                         }
                       });
                     },
@@ -111,17 +114,17 @@ class _TodoCardState extends State<TodoCard> {
                             : const Icon(Icons.circle,
                                 size: 8, color: Color(0xFF84E563)),
                         const SizedBox(width: 5),
-                        showDateUntil == false &&
+                        _showDateUntil == false &&
                                 widget.todoModel.isDone == false
                             ? Text(
                                 widget.todoModel.dateUntil != null
                                     ? TodoController().countUntilTime(
                                         widget.todoModel.dateUntil!)
                                     : '',
-                                style: Styles().textStyleDoneText,
+                                style: Styles.textStyleDoneText,
                               )
                             : Text('till'.tr + correctFormatDate,
-                                style: Styles().textStyleDoneText),
+                                style: Styles.textStyleDoneText),
                       ],
                     ),
                   ),

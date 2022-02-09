@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:todoz_app/controllers/todo_controller.dart';
 import 'package:todoz_app/controllers/user_controller.dart';
 import 'package:todoz_app/models/user_model.dart';
-import 'package:todoz_app/pages/home_page.dart';
 import 'package:todoz_app/pages/sign_up_page.dart';
 import 'package:todoz_app/services/database.dart';
 import 'package:todoz_app/utils/root.dart';
@@ -25,7 +25,7 @@ class AuthController extends GetxController {
       UserCredential _userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      /// Creates user in database.dart
+      /// Creates user in [Database]
       UserModel _user = UserModel(
           id: _userCredential.user?.uid,
           email: _userCredential.user?.email,
@@ -49,7 +49,7 @@ class AuthController extends GetxController {
       update();
 
       (_auth.currentUser != null)
-          ? Get.to(() => Home())
+          ? Get.to(() => const Root())
           : Get.snackbar('title', 'message');
     } catch (e) {
       Get.snackbar('Log In Error', e.toString(),
@@ -62,7 +62,8 @@ class AuthController extends GetxController {
     try {
       await _auth.signOut();
       Get.find<UserController>().clear();
-      Get.offAll(Root());
+      Get.find<TodoController>().clear();
+      Get.offAll(const Root());
       Get.to(SignUp());
     } catch (e) {
       Get.snackbar('Sign Out Error', e.toString(),
