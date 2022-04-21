@@ -31,10 +31,10 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   eva_icons_flutter: ^3.0.2
-  google_fonts: 2.2.0
+  google_fonts: ^2.3.1
   get: ^4.3.8
   firebase_auth:
-  firebase_core: ^1.10.0
+  firebase_core: ^1.14.0
   cloud_firestore: ^3.1.0
   date_time_format: ^2.0.1
   percent_indicator: ^3.4.0
@@ -43,20 +43,32 @@ dependencies:
   swipeable_tile: ^0.0.2
   fl_chart: ^0.41.0
   get_storage: ^2.0.3
-  
-  
-  
+  rive: ^0.8.1
+  cached_network_image: ^3.2.0
+  google_sign_in: ^5.2.3
+  flutter_native_splash: ^2.0.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^1.0.0
+  flutter_launcher_icons: ^0.9.2
+
+flutter_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: 'assets/icon/appIcon.png'
+  icon_adaptive_background: '#6E4AFF'
+
+flutter_native_splash:
+  color: '#6E4AFF'
+  image: assets/splash_screen/splash_screen_image.png
+  android: true
+  ios: true
+  #android_gravity: fill
+  #ios_content_mode: scaleAspectFill
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -71,9 +83,11 @@ flutter:
 
   assets:
     - assets/
-    - assets/images/
-    - assets/images/signup_page/
-    - assets/images/login_page/
+    - assets/icon/
+    - assets/splash_screen/
+    - assets/images_animations/
+    - assets/images_animations/login_page/
+    - assets/images_animations/signup_page/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
