@@ -1,16 +1,67 @@
-# todoz_app
+# Flutter Todozzz App
 
-A new Flutter project.
+A simple todo app made with Flutter. ![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/todozzz_app.png)
+## Table of Contents:
+* [General Info](#general-info)
+* [Features](#features)
+* [How to install](#how-to-install)
+* [Languages](#languages)
+* [Technologies Used](#technologies-used)
 
-## Getting Started
+## General info
+This project is a simple todo app made with [Flutter](https://flutter.dev). The purpose of this this project is to try out GetX, Firebase, Firestore, Rive and Google SignIn. 
 
-This project is a starting point for a Flutter application.
+UI inspired by: [Dmitry Lauretsky for Ronas IT | UI/UX Team](https://dribbble.com/shots/15963414-Task-Management-App)
 
-A few resources to get you started if this is your first Flutter project:
+## Features
+#### Progressive tasks 
+Track how much time you spend doing tasks
+![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/progressive_feature.png)
+#### Swipe rigth to delete, left to mark task as done/undone
+![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/swipe_delete_feature.png) ![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/swipe_done_feature.png) ![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/swipe_undo_feature.png)
+#### Track productivity
+ ![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/productivity_feature.png)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+#### Project folders
+Keep your tasks in different project folders
+![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/project_folder_feature.png) ![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/add_tasks_to_project_feature.png)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+#### Change and preview your project
+![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/change_preview_project_feature.png)
+#### Track how many tasks you have/had yesterday-today-tomorrow
+![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/yesterday_progress_feature.png) ![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/today_progress_feature.png) ![pic](https://github.com/RusAntr/todoz_app/blob/master/lib/pics/tomorrow_progress_feature.png)
+
+## How to install
+#### Step 1:
+
+Fork this project
+
+```
+'git clone https://github.com/RusAntr/todoz_app.git'
+```
+#### Step 2:
+
+Open the project folder with VS Code and execute the following command to install the dependency package:
+```
+flutter pub get
+```
+#### Step 3:
+
+Open the main.dart file in the lib folder, F5 or Ctrl + F5 to run the project.
+## Languages
+* Russian (Русский)
+* English
+* Mandarin Chinese (普通话)
+
+## Technologies used
+* [Flutter](https://flutter.dev)
+* [Dart](https://dart.dev)
+
+#### Packages
+* [get 4.3.8](https://pub.dev/packages/get) - state managment, DI, translations
+* [firebase_auth](https://pub.dev/packages/firebase_auth) - user authentication
+* [firebase_core 1.14.0](https://pub.dev/packages/firebase_core) - BaaS
+* [cloud_firestore 3.1.0](https://pub.dev/packages/cloud_firestore) - Firestore DB
+* [google_sign_in 5.2.3](https://pub.dev/packages/google_sign_in) - Google Sign In
+* [rive 0.8.1](https://pub.dev/packages/rive) - animations
+* [fl_chart: ^0.41.0](https://pub.dev/packages/fl_chart) - chart
