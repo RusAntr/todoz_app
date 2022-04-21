@@ -205,7 +205,7 @@ class TodoController extends GetxController {
     );
   }
 
-  /// Returns properly formatted string of how many tasks are done yesterday/today/tommorow or all
+  /// Returns properly formatted string of how many tasks are done yesterday/today/tomorrow or all
   String allTasksTitleProgress(bool areAllTasks, DateTime dateTime) {
     String _language =
         Get.find<LocalizationController>().currentLocale.languageCode;
@@ -225,7 +225,7 @@ class TodoController extends GetxController {
     return doneTasks == 0 ? 0 : (doneTasks / allTasks);
   }
 
-  /// Returns number of done tasks yesterday/today/tommorow or all
+  /// Returns number of done tasks yesterday/today/tomorrow or all
   int howManyTasksDoneProgress(
     DateTime? untilDay,
     bool getAll,
@@ -246,7 +246,7 @@ class TodoController extends GetxController {
     return retVal.length;
   }
 
-  /// Returns a percentage of done tasks vs. undone tasks yesterday/today/tommorow or all
+  /// Returns a percentage of done tasks vs. undone tasks yesterday/today/tomorrow or all
   double tasksProgressPercent(DateTime untilDay, bool getAll) {
     int doneTasks = howManyTasksDoneProgress(untilDay, getAll);
     List<TodoModel> retVal = [];
