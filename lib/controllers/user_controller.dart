@@ -19,7 +19,7 @@ class UserController extends GetxController {
 
   @override
   onInit() {
-    _uid = Get.find<AuthController>().user!.uid;
+    // _uid = Get.find<AuthController>().user!.uid;
     if (Get.find<AuthController>().user != null) {
       String _uid = Get.find<AuthController>().user!.uid;
       _userModel.bindStream(_firestoreRepository.getUserStream(_uid));

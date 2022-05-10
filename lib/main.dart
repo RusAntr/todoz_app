@@ -20,11 +20,10 @@ void main() async {
     storageBucket: 'todoz-3aee8.appspot.com',
     measurementId: 'G-TX03FX0FV0',
   );
-  if (kIsWeb) {
-    await Firebase.initializeApp(options: _options);
-  } else {
-    await Firebase.initializeApp();
-  }
+
+  kIsWeb
+      ? await Firebase.initializeApp(options: _options)
+      : await Firebase.initializeApp();
 
   await GetStorage().initStorage;
   Get.put<LocalizationController>(LocalizationController());
@@ -33,7 +32,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

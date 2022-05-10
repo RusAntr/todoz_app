@@ -5,7 +5,6 @@ import 'package:todoz_app/controllers/user_controller.dart';
 import 'package:todoz_app/data/models/models.dart';
 import 'package:todoz_app/core/custom_snackbars.dart';
 import 'package:todoz_app/core/root.dart';
-import 'package:todoz_app/ui/pages/sign_up_page.dart';
 import '../data/api/firestore_api.dart';
 
 class AuthController extends GetxController {
@@ -54,8 +53,8 @@ class AuthController extends GetxController {
     try {
       UserCredential _userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      Get.find<UserController>().userModel =
-          await _firestoreRepository.getUser(_userCredential.user!.uid);
+      Get.find<UserController>().userModel = await _firestoreRepository
+          .getUser(_userCredential.user!.uid) as UserModel;
       update();
       (_auth.currentUser != null)
           ? Get.to(() => const Root())
@@ -85,16 +84,20 @@ class AuthController extends GetxController {
       UserCredential _userCredential =
           await _auth.signInWithCredential(credential);
 
-      /// Creates user in [Database]
-      UserModel _user = UserModel(
-          id: _userCredential.user!.uid,
-          email: _userCredential.user!.email,
-          name: _userCredential.user!.displayName);
+      UserModel _user;
 
-      if (await _firestoreRepository.createNewUser(_user)) {
-        Get.find<UserController>().userModel = _user;
-        Get.back();
-      }
+      /// Checks if [UserModel] exists in database, if not creates it
+      _user = await _firestoreRepository.getUser(_userCredential.user!.uid) ??
+          UserModel(
+            id: _userCredential.user!.uid,
+            email: _userCredential.user!.email,
+            name: _userCredential.user!.displayName,
+          );
+
+      await _firestoreRepository.createNewUser(_user);
+
+      Get.find<UserController>().userModel = _user;
+      Get.back();
     } on FirebaseAuthException catch (error) {
       CustomSnackbars.error(
         error.code,
@@ -103,12 +106,13 @@ class AuthController extends GetxController {
     }
   }
 
-  /// Signs user out of the app
+  /// Clears controllers and signs user out of the app
   void signOut() async {
     try {
+      await _googleSignIn.signOut();
       await _auth.signOut();
+      Get.reloadAll(force: true);
       Get.offAll(const Root());
-      Get.to(SignUp());
     } on FirebaseAuthException catch (error) {
       CustomSnackbars.error(
         error.code,

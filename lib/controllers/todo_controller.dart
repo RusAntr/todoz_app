@@ -87,16 +87,16 @@ class TodoController extends GetxController {
     int yesterday = date.subtract(const Duration(days: 1)).day;
     List<int> days = [yesterday, date.day, tomorrow];
     for (var item in todos) {
-      bool unshowDoneTasks = !showAllTodos && item!.dateUntil != null;
+      bool unshowAllTasks = !showAllTodos && item!.dateUntil != null;
       int i = 0;
-      if (unshowDoneTasks) {
+      if (unshowAllTasks) {
         while (i <= 2) {
           if (pageIndex == i && item.dateUntil!.toDate().day == days[i]) {
             retVal.add(item);
           }
           i++;
         }
-      } else {
+      } else if (showAllTodos) {
         retVal.add(item!);
       }
     }
