@@ -41,8 +41,7 @@ class _InsideProjectPageState extends State<InsideProjectPage>
   int get _howManyDone {
     return _todoController.todos
         .where((element) =>
-            element!.projectName == _projectModel.projectName &&
-            element.isDone == true)
+            element!.projectName == _projectModel.projectName && element.isDone)
         .length;
   }
 
@@ -50,7 +49,7 @@ class _InsideProjectPageState extends State<InsideProjectPage>
     return _todoController.todos
         .where((element) =>
             element!.projectName == _projectModel.projectName &&
-            element.isDone == false)
+            !element.isDone)
         .length;
   }
 
@@ -59,7 +58,7 @@ class _InsideProjectPageState extends State<InsideProjectPage>
         .where((element) =>
             element!.projectName == _projectModel.projectName &&
             element.duration != null &&
-            element.isDone == false)
+            !element.isDone)
         .length;
   }
 
@@ -297,8 +296,7 @@ class _InsideProjectPageState extends State<InsideProjectPage>
           color: Colors.white,
           size: 20.0,
         ),
-        onPressed: () =>
-            TodoController().openCreateTodo(context, false, _projectModel),
+        onPressed: () => TodoController().openCreateTodo(context, false),
       ),
     );
   }

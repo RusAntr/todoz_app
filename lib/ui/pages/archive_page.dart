@@ -33,9 +33,8 @@ class ArchivePage extends GetWidget<TodoController> {
         ),
         body: GetX<TodoController>(
           builder: (_) {
-            var _modelsList = controller.todos
-                .where((element) => element!.isDone == true)
-                .toList();
+            var _modelsList =
+                controller.todos.where((element) => element!.isDone).toList();
             return _modelsList.isEmpty
                 ? const EmptyTodo()
                 : ListView.builder(

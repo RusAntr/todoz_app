@@ -95,7 +95,7 @@ class _ProgressWidgetState extends State<ProgressWidget> {
       circularStrokeCap: CircularStrokeCap.round,
       animationDuration: 500,
       center: Text(
-        (percentage == 0 || percentage.isNaN == true)
+        (percentage == 0 || percentage.isNaN)
             ? '0% :('
             : (percentage == 100)
                 ? '100%'
@@ -127,7 +127,7 @@ class _ProgressWidgetState extends State<ProgressWidget> {
         ),
         const SizedBox(height: 20),
         Text(
-          percentage.isNaN == false
+          !percentage.isNaN
               ? todoController.allTasksTitleProgress(
                   widget.areAllTasks, widget.dateTime)
               : 'noTasks'.tr,

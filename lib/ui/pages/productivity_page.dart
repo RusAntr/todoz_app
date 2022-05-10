@@ -174,9 +174,8 @@ class ProductivityPage extends GetWidget<TodoController> {
           Obx(
             () => NumberOfTasks(
               controller: controller,
-              text: _tasksPluralLabel(controller.todos
-                  .where((element) => element!.isDone == true)
-                  .length),
+              text: _tasksPluralLabel(
+                  controller.todos.where((element) => element!.isDone).length),
             ),
           ),
           Obx(
@@ -257,7 +256,7 @@ class NumberOfTasks extends StatelessWidget {
         children: [
           Text(
             controller.todos
-                .where((element) => element!.isDone == true)
+                .where((element) => element!.isDone)
                 .length
                 .toString(),
             style: AppTextStyles.numberOfTasksProductivity,

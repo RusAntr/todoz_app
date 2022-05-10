@@ -34,14 +34,15 @@ class LocalizationController extends GetxController {
 
   /// Returns [LocaleType] for a [DatePicker]
   LocaleType get currentLocaleType {
-    if (currentLocale.languageCode == 'en') {
-      return LocaleType.en;
-    } else if (currentLocale.languageCode == 'ru') {
-      return LocaleType.ru;
-    } else if (currentLocale.languageCode == 'zh') {
-      return LocaleType.zh;
-    } else {
-      return LocaleType.en;
+    switch (currentLocale.languageCode) {
+      case 'en':
+        return LocaleType.en;
+      case 'ru':
+        return LocaleType.ru;
+      case 'zh':
+        return LocaleType.zh;
+      default:
+        return LocaleType.en;
     }
   }
 

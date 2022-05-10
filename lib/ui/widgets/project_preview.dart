@@ -106,7 +106,7 @@ class _ProjectPreviewState extends State<ProjectPreview> {
   }
 
   Widget _procentIndicator() {
-    double percentage = widget.isCreate == true
+    double percentage = widget.isCreate
         ? 0.5
         : _todoController.doneTasksInProjectPercent(widget.projectName);
     return Padding(

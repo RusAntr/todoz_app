@@ -17,21 +17,18 @@ class LogInAnimationState extends State<LogInAnimation> {
   void onTap() {
     _isClosingInput!.value = false;
     _onTapInput!.value = true;
-    if (_onTapInput!.value == false &&
-        _onTapInput!.controller.isActive == false) {
+    if (!_onTapInput!.value && !_onTapInput!.controller.isActive) {
       _onTapInput!.controller.isActive = true;
-    } else if (_onTapInput!.value == true && _onTapInput!.value == false) {
+    } else if (_onTapInput!.value && !_onTapInput!.value) {
       _onTapInput!.controller.isActive = false;
     }
   }
 
   void onClose() {
     _isClosingInput!.value = true;
-    if (_isClosingInput!.value == false &&
-        _isClosingInput!.controller.isActive == false) {
+    if (!_isClosingInput!.value && !_isClosingInput!.controller.isActive) {
       _isClosingInput!.controller.isActive = true;
-    } else if (_isClosingInput!.value == true &&
-        _isClosingInput!.value == false) {
+    } else if (_isClosingInput!.value && !_isClosingInput!.value) {
       _isClosingInput!.controller.isActive = false;
     }
   }

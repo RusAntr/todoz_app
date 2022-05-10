@@ -1,7 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:todoz_app/controllers/project_controller.dart';
 import 'package:todoz_app/controllers/todo_controller.dart';
 import 'package:todoz_app/controllers/user_controller.dart';
 import 'package:todoz_app/ui/pages/archive_page.dart';
@@ -17,7 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late TodoController _todoController;
-  late ProjectController _projectController;
   late int _pageIndex;
   late DateTime _date;
   late List<Widget> progressWidgets;
@@ -27,7 +25,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _todoController = Get.put(TodoController());
-    _projectController = Get.put(ProjectController());
     _date = DateTime.now();
     _showAllTodos = false;
     _pageIndex = 1;
@@ -156,7 +153,7 @@ class _HomePageState extends State<HomePage> {
               _pageIndex,
               _showAllTodos,
             )
-            .where((element) => element.isDone == false)
+            .where((element) => !element.isDone)
             .toList()
             .isNotEmpty) {
           return SizedBox(
@@ -170,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                     _pageIndex,
                     _showAllTodos,
                   )
-                  .where((element) => element.isDone == false)
+                  .where((element) => !element.isDone)
                   .length,
               itemBuilder: (_, index) {
                 return TodoCard(
@@ -180,7 +177,7 @@ class _HomePageState extends State<HomePage> {
                         _pageIndex,
                         _showAllTodos,
                       )
-                      .where((element) => element.isDone == false)
+                      .where((element) => !element.isDone)
                       .toList()[index],
                 );
               },
@@ -220,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                           _pageIndex,
                           _showAllTodos,
                         )
-                        .where((element) => element.isDone == false)
+                        .where((element) => !element.isDone)
                         .length
                         .toString(),
                     style: AppTextStyles.textStyleSmallGreenText,
@@ -231,27 +228,18 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(width: 10),
           GestureDetector(
-            onTap: () {
-              setState(
-                () {
-                  if (_showAllTodos == false) {
-                    _showAllTodos = true;
-                  } else if (_showAllTodos == true) {
-                    _showAllTodos = false;
-                  }
-                },
-              );
-            },
+            onTap: () =>
+                setState(() => _showAllTodos = _showAllTodos ? false : true),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               height: 25,
-              width: _showAllTodos == true ? 50 : 40,
+              width: _showAllTodos ? 50 : 40,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(7),
                   color: AppColors.accentGreen),
               child: Center(
                 child: Text(
-                  _showAllTodos == false ? 'all'.tr : 'less'.tr,
+                  !_showAllTodos ? 'all'.tr : 'less'.tr,
                   style: AppTextStyles.textStyleSmallGreenText,
                 ),
               ),
@@ -324,11 +312,7 @@ class _HomePageState extends State<HomePage> {
       splashColor: AppColors.darkPurple,
       elevation: 30.0,
       backgroundColor: AppColors.mainPurple,
-      onPressed: () => _todoController.openCreateTodo(
-        context,
-        true,
-        _projectController.projects.first,
-      ),
+      onPressed: () => _todoController.openCreateTodo(context, true),
       child: const Icon(
         Icons.add_rounded,
       ),

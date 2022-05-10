@@ -13,11 +13,11 @@ class CreateTodo extends StatefulWidget {
   const CreateTodo({
     Key? key,
     required this.showAllProjects,
-    required this.projectModel,
+    this.projectModel,
   }) : super(key: key);
 
   final bool showAllProjects;
-  final ProjectModel projectModel;
+  final ProjectModel? projectModel;
 
   @override
   State<CreateTodo> createState() => _CreateTodoState();
@@ -95,14 +95,14 @@ class _CreateTodoState extends State<CreateTodo> {
         ),
         onPressed: () {
           _todoController.addTodo(
-            projectName: widget.showAllProjects == true
+            projectName: widget.showAllProjects
                 ? _pickedProject!.projectName
-                : widget.projectModel.projectName,
+                : widget.projectModel!.projectName,
             content: _textEditingController.text,
-            projectId: widget.showAllProjects == true
+            projectId: widget.showAllProjects
                 ? _pickedProject!.projectId
-                : widget.projectModel.projectId,
-            dateUntil: _dateUntil.isBlank == true ? null : _dateUntil,
+                : widget.projectModel!.projectId,
+            dateUntil: _dateUntil.isBlank! ? null : _dateUntil,
             duration: _duration == null ||
                     (_duration!.hour == 0 &&
                         _duration!.minute == 0 &&

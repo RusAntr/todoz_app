@@ -4,7 +4,6 @@ import 'package:todoz_app/controllers/auth_controller.dart';
 import 'package:todoz_app/controllers/localization_controller.dart';
 import 'package:todoz_app/controllers/user_controller.dart';
 import 'package:todoz_app/ui/ui_export.dart';
-import 'package:todoz_app/ui/widgets/menu_items.dart';
 import '../../core/constants/constants.dart';
 
 class ProfilePage extends GetWidget<UserController> {

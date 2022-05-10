@@ -43,13 +43,12 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
   void initState() {
     _projectController = Get.find<ProjectController>();
     _textEditingController = TextEditingController();
-    _projectName = widget.isCreate == true
-        ? 'newProject'.tr
-        : widget.projectModel!.projectName;
-    _pickedColor = widget.isCreate == true
+    _projectName =
+        widget.isCreate ? 'newProject'.tr : widget.projectModel!.projectName;
+    _pickedColor = widget.isCreate
         ? _colors[0]
         : AppColors().getColor(widget.projectModel!.color);
-    _pickedCover = widget.isCreate == true
+    _pickedCover = widget.isCreate
         ? UrlImages().images[0]
         : widget.projectModel!.projectCover;
     super.initState();
@@ -82,7 +81,7 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              widget.isCreate == false ? _deleteButton() : Container(),
+              !widget.isCreate ? _deleteButton() : Container(),
               _createChangeButton(),
             ],
           ),
@@ -106,7 +105,7 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
         ),
         onPressed: () => setState(() => createOrChange()),
         child: Text(
-          widget.isCreate == true ? 'create'.tr : 'change'.tr,
+          widget.isCreate ? 'create'.tr : 'change'.tr,
           style: AppTextStyles.textStyleProjectChipText,
         ),
       ),
@@ -230,7 +229,7 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
             children: [
               Center(
                 child: Text(
-                  widget.isCreate == true ? 'newProject'.tr : 'change'.tr,
+                  widget.isCreate ? 'newProject'.tr : 'change'.tr,
                   style: AppTextStyles.textStyleAddTaskText,
                 ),
               ),
@@ -246,7 +245,7 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
   }
 
   void createOrChange() {
-    if (widget.isCreate == true) {
+    if (widget.isCreate) {
       _projectController.addProject(
         controller: _textEditingController,
         color: _pickedColor,

@@ -137,7 +137,7 @@ class TodoProgressiveCardState extends State<TodoProgressiveCard>
 
   Widget _tileBackground(SwipeDirection direction) {
     if (direction == SwipeDirection.endToStart) {
-      if (widget.todoModel.isDone == false) {
+      if (!widget.todoModel.isDone) {
         return Container(
           padding: const EdgeInsets.only(right: 25),
           decoration: BoxDecoration(
@@ -266,17 +266,13 @@ class TodoProgressiveCardState extends State<TodoProgressiveCard>
   }
 
   void _timerOnOff() {
-    if (_timer.isActive == false) {
-      _starTimer();
-    } else {
-      _stopTimer();
-    }
+    _timer.isActive ? _stopTimer() : _starTimer();
   }
 
   void _onSwipe(SwipeDirection direction) {
     if (direction == SwipeDirection.endToStart) {
       _todoController.updateTodo(
-        newValue: widget.todoModel.isDone == true ? false : true,
+        newValue: widget.todoModel.isDone ? false : true,
         todoId: widget.todoModel.todoId,
         projectId: _projectController.getProjectId(widget.todoModel),
         projectName: widget.todoModel.projectName,

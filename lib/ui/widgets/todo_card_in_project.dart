@@ -44,7 +44,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
       borderRadius: 25,
       swipeThreshold: 0.2,
       direction: SwipeDirection.horizontal,
-      color: widget.todoModel.isDone == true
+      color: widget.todoModel.isDone
           ? AppColors().getColor(widget.projectColor)
           : Colors.white,
       verticalPadding: 10,
@@ -59,7 +59,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
       child: GestureDetector(
         onLongPress: () {
           _todoController.updateTodo(
-            newValue: widget.todoModel.isDone == true ? false : true,
+            newValue: widget.todoModel.isDone ? false : true,
             todoId: widget.todoModel.todoId,
             projectId: widget.projectId,
             projectName: widget.todoModel.projectName,
@@ -73,7 +73,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
               width: width,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25.0),
-                color: widget.todoModel.isDone == false
+                color: !widget.todoModel.isDone
                     ? Colors.white
                     : AppColors().getColor(widget.projectColor),
               ),
@@ -93,7 +93,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
                       ],
                     ),
                     Text(
-                      widget.todoModel.isDone == true ? 'taskDone'.tr : '',
+                      widget.todoModel.isDone ? 'taskDone'.tr : '',
                       style: AppTextStyles.textStyleProjectNamePreview,
                     ),
                   ],
@@ -114,7 +114,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
         scrollDirection: Axis.vertical,
         child: SelectableText(
           widget.todoModel.content,
-          style: widget.todoModel.isDone == true
+          style: widget.todoModel.isDone
               ? AppTextStyles.whiteTitleNormal
                   .copyWith(fontWeight: FontWeight.w600)
               : AppTextStyles.todoContentProgressive,
@@ -130,7 +130,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
         Icon(
           EvaIcons.calendarOutline,
           size: 20,
-          color: widget.todoModel.isDone == false
+          color: !widget.todoModel.isDone
               ? Colors.black.withOpacity(0.5)
               : Colors.white.withOpacity(0.5),
         ),
@@ -141,7 +141,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
             '',
             widget.todoModel.dateCreated.toDate(),
           ),
-          style: widget.todoModel.isDone == false
+          style: !widget.todoModel.isDone
               ? AppTextStyles.textStyleTodoWidgetDateBlack
               : AppTextStyles.textStyleTodoWidgetDateWhite,
         ),
@@ -151,7 +151,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
 
   Widget _buildBackground(SwipeDirection direction) {
     if (direction == SwipeDirection.endToStart) {
-      if (widget.todoModel.isDone == false) {
+      if (!widget.todoModel.isDone) {
         return Container(
           padding: const EdgeInsets.only(right: 25),
           decoration: BoxDecoration(
@@ -190,7 +190,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
   void _onSwipe(SwipeDirection direction) {
     if (direction == SwipeDirection.endToStart) {
       _todoController.updateTodo(
-        newValue: widget.todoModel.isDone == true ? false : true,
+        newValue: widget.todoModel.isDone ? false : true,
         todoId: widget.todoModel.todoId,
         projectId: widget.projectId,
         projectName: widget.todoModel.projectName,

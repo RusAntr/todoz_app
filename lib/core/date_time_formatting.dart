@@ -143,7 +143,7 @@ class DateTimeFormatting {
   /// Returns properly formatted date to be more readable (D 00, M 00, Y 0000)
   static String dateText(bool areAllTasks, String day, DateTime dateTime) {
     String dateText = '';
-    if (areAllTasks == false) {
+    if (!areAllTasks) {
       dateText = day.tr + dateTime.format('j.m Y');
     } else {
       dateText = 'allTasks'.tr;

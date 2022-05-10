@@ -77,29 +77,20 @@ class TodoController extends GetxController {
     bool showAllTodos,
   ) {
     List<TodoModel> retVal = [];
-    int yesterday = date
-        .subtract(
-          const Duration(days: 1),
-        )
-        .day;
     int tomorrow = date.add(const Duration(days: 1)).day;
+    int yesterday = date.subtract(const Duration(days: 1)).day;
+    List<int> days = [yesterday, date.day, tomorrow];
     for (var item in todos) {
-      if (pageIndex == 0 &&
-          item!.dateUntil != null &&
-          item.dateUntil!.toDate().day == yesterday &&
-          showAllTodos == false) {
-        retVal.add(item);
-      } else if (pageIndex == 1 &&
-          item!.dateUntil != null &&
-          item.dateUntil!.toDate().day == date.day &&
-          showAllTodos == false) {
-        retVal.add(item);
-      } else if (pageIndex == 2 &&
-          item!.dateUntil != null &&
-          item.dateUntil!.toDate().day == tomorrow &&
-          showAllTodos == false) {
-        retVal.add(item);
-      } else if (showAllTodos == true) {
+      bool unshowDoneTasks = !showAllTodos && item!.dateUntil != null;
+      int i = 0;
+      if (unshowDoneTasks) {
+        while (i <= 2) {
+          if (pageIndex == i && item.dateUntil!.toDate().day == days[i]) {
+            retVal.add(item);
+          }
+          i++;
+        }
+      } else {
         retVal.add(item!);
       }
     }
@@ -110,11 +101,9 @@ class TodoController extends GetxController {
   List<TodoModel> doneUndondeProgressiveTodos(bool showAllTodos) {
     List<TodoModel> retVal = [];
     for (var todo in todos) {
-      if (showAllTodos == false &&
-          todo!.duration != null &&
-          todo.isDone == false) {
+      if (!showAllTodos && todo!.duration != null && !todo.isDone) {
         retVal.add(todo);
-      } else if (showAllTodos == true && todo!.duration != null) {
+      } else if (showAllTodos && todo!.duration != null) {
         retVal.add(todo);
       }
     }
@@ -138,7 +127,6 @@ class TodoController extends GetxController {
   void openCreateTodo(
     BuildContext context,
     bool visible,
-    ProjectModel? projectModel,
   ) {
     showDialog(
       context: context,
@@ -149,7 +137,6 @@ class TodoController extends GetxController {
         children: [
           CreateTodo(
             showAllProjects: visible,
-            projectModel: projectModel!,
           )
         ],
       ),
@@ -165,9 +152,9 @@ class TodoController extends GetxController {
     for (var item in todos) {
       if (item!.dateUntil != null &&
           item.dateUntil!.toDate().day == untilDay.day &&
-          areAllTasks == false) {
+          !areAllTasks) {
         retVal.add(item);
-      } else if (areAllTasks == true) {
+      } else if (areAllTasks) {
         retVal.add(item);
       }
     }
@@ -180,7 +167,7 @@ class TodoController extends GetxController {
         todos.where((element) => element!.projectName == projectName);
     var listDone = [];
     for (var item in listModels) {
-      if (item!.isDone == true) {
+      if (item!.isDone) {
         listDone.add(item);
       }
     }
@@ -232,13 +219,12 @@ class TodoController extends GetxController {
   ) {
     List<TodoModel> retVal = [];
     for (var item in todos) {
-      if (item!.dateUntil != null && getAll == false) {
-        if (item.isDone == true &&
-            item.dateUntil!.toDate().day == untilDay!.day) {
+      if (item!.dateUntil != null && !getAll) {
+        if (item.isDone && item.dateUntil!.toDate().day == untilDay!.day) {
           retVal.add(item);
         }
-      } else if (getAll == true) {
-        if (item.isDone == true) {
+      } else if (getAll) {
+        if (item.isDone) {
           retVal.add(item);
         }
       }
@@ -253,9 +239,9 @@ class TodoController extends GetxController {
     for (var item in todos) {
       if (item!.dateUntil != null &&
           item.dateUntil!.toDate().day == untilDay.day &&
-          getAll == false) {
+          !getAll) {
         retVal.add(item);
-      } else if (getAll == true) {
+      } else if (getAll) {
         retVal.add(item);
       }
     }
@@ -278,7 +264,7 @@ class TodoController extends GetxController {
     return todos
         .where(
           (element) =>
-              element!.isDone == true &&
+              element!.isDone &&
               element.dateUntil != null &&
               element.dateUntil!.toDate().day == day.day,
         )
@@ -310,54 +296,31 @@ class TodoController extends GetxController {
     List<TodoModel> _beforeYesterday = [];
     List<TodoModel> _yesterday = [];
     List<TodoModel> _today = [];
+    List<List<TodoModel>> listOfLists = [
+      _today,
+      _yesterday,
+      _beforeYesterday,
+      _threeDaysAgo,
+      _fourDaysAgo,
+      _fiveDaysAgo,
+      _sixDaysAgo,
+    ];
 
-    for (var item in todos) {
-      if (item!.isDone == true &&
-          item.dateUntil != null &&
-          item.dateUntil!.toDate().day == today.day) {
-        _today.add(item);
-      } else if (item.isDone == true &&
-          item.dateUntil != null &&
-          item.dateUntil!.toDate().day ==
-              today.subtract(const Duration(days: 1)).day) {
-        _yesterday.add(item);
-      } else if (item.isDone == true &&
-          item.dateUntil != null &&
-          item.dateUntil!.toDate().day ==
-              today.subtract(const Duration(days: 2)).day) {
-        _beforeYesterday.add(item);
-      } else if (item.isDone == true &&
-          item.dateUntil != null &&
-          item.dateUntil!.toDate().day ==
-              today.subtract(const Duration(days: 3)).day) {
-        _threeDaysAgo.add(item);
-      } else if (item.isDone == true &&
-          item.dateUntil != null &&
-          item.dateUntil!.toDate().day ==
-              today.subtract(const Duration(days: 4)).day) {
-        _fourDaysAgo.add(item);
-      } else if (item.isDone == true &&
-          item.dateUntil != null &&
-          item.dateUntil!.toDate().day ==
-              today.subtract(const Duration(days: 5)).day) {
-        _fiveDaysAgo.add(item);
-      } else if (item.isDone == true &&
-          item.dateUntil != null &&
-          item.dateUntil!.toDate().day ==
-              today.subtract(const Duration(days: 6)).day) {
-        _sixDaysAgo.add(item);
+    for (TodoModel? item in todos) {
+      bool doneTaskHasDate = item!.isDone && item.dateUntil != null;
+      int i = 0;
+      DateTime day = today;
+      if (doneTaskHasDate) {
+        while (i <= 6) {
+          if (item.dateUntil!.toDate().day == day.day) {
+            listOfLists[i].add(item);
+          }
+          day = day.subtract(Duration(days: i));
+          i++;
+        }
       }
     }
-    List<int> _listOfDays = [
-      _today.length,
-      _yesterday.length,
-      _beforeYesterday.length,
-      _threeDaysAgo.length,
-      _fourDaysAgo.length,
-      _fiveDaysAgo.length,
-      _sixDaysAgo.length
-    ];
-    _listOfDays.sort();
-    return _listOfDays.last.toDouble();
+    listOfLists.sort((a, b) => a.length.compareTo(b.length));
+    return listOfLists.last.length.toDouble();
   }
 }

@@ -85,14 +85,7 @@ class _TodoCardState extends State<TodoCard> {
                   ),
                   GestureDetector(
                     onTap: () => setState(
-                      () {
-                        if (_showDateUntil == true) {
-                          _showDateUntil = false;
-                        } else if (_showDateUntil == false) {
-                          _showDateUntil = true;
-                        }
-                      },
-                    ),
+                        () => _showDateUntil = _showDateUntil ? false : true),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -106,8 +99,7 @@ class _TodoCardState extends State<TodoCard> {
                                 color: AppColors.mainGreen,
                               ),
                         const SizedBox(width: 5),
-                        _showDateUntil == false &&
-                                widget.todoModel.isDone == false
+                        !_showDateUntil && !widget.todoModel.isDone
                             ? Text(
                                 widget.todoModel.dateUntil != null
                                     ? DateTimeFormatting.countUntilTime(
