@@ -19,15 +19,14 @@ class UserController extends GetxController {
 
   @override
   onInit() {
-    // _uid = Get.find<AuthController>().user!.uid;
     if (Get.find<AuthController>().user != null) {
-      String _uid = Get.find<AuthController>().user!.uid;
+      _uid = Get.find<AuthController>().user!.uid;
       _userModel.bindStream(_firestoreRepository.getUserStream(_uid));
     }
     super.onInit();
   }
 
   /// Updates [UserModel]'s name property
-  void updateUsername(String newName) =>
-      _firestoreRepository.updateUsername(_uid, newName);
+  void updateUsername(String newName) async =>
+      await _firestoreRepository.updateUsername(_uid, newName);
 }
