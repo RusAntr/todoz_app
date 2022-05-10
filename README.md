@@ -10,6 +10,12 @@ A simple todo app made with Flutter. ![pic](https://github.com/RusAntr/todoz_app
 
 ## General info
 This project is a simple todo app made with [Flutter](https://flutter.dev). The purpose of this this project is to try out GetX, Firebase, Firestore, Rive and Google SignIn. 
+In this project I managed to implement:
+1. User auth with Firebase and Google auth
+2. Storing and syncing data to Firestore DB
+3. Cute Sign up/ Log in animations made with Rive
+4. Simple state-managment using GetX
+5. Translations to 3 languages using Getx
 
 UI inspired by: [Dmitry Lauretsky for Ronas IT | UI/UX Team](https://dribbble.com/shots/15963414-Task-Management-App)
 
