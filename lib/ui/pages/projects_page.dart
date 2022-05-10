@@ -7,7 +7,7 @@ import '../ui_export.dart';
 
 class ProjectsPage extends StatelessWidget {
   ProjectsPage({Key? key}) : super(key: key);
-  final _projectController = Get.find<ProjectController>();
+  final _projectController = Get.put<ProjectController>(ProjectController());
 
   @override
   Widget build(BuildContext context) {

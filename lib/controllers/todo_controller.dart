@@ -25,6 +25,12 @@ class TodoController extends GetxController {
     super.onInit();
   }
 
+  @override
+  void onClose() {
+    _todoList.close();
+    super.onClose();
+  }
+
   /// Creates a new document to store [TodoModel] in [FirebaseFirestore]
   void addTodo({
     required String content,

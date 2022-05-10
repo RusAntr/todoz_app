@@ -23,6 +23,12 @@ class ProjectController extends GetxController {
     super.onInit();
   }
 
+  @override
+  onClose() {
+    _projectList.close();
+    super.onClose();
+  }
+
   /// Returns project's id for [TodoModel]
   String getProjectId(TodoModel todoModel) {
     String projectId = projects
