@@ -17,8 +17,8 @@ class TodoModel {
     required this.projectName,
     required this.dateCreated,
     required this.isDone,
-    this.dateUntil,
-    this.duration,
+    required this.dateUntil,
+    required this.duration,
     required this.timePassed,
     required this.userId,
   });

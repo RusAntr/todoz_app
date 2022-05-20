@@ -4,14 +4,6 @@ import 'package:date_time_format/src/date_time_extension_methods.dart';
 import '../data/models/models.dart';
 
 class DateTimeFormatting {
-  static DateTime today = DateTime.now();
-  static DateTime yesterday = today.subtract(const Duration(days: 1));
-  static DateTime beforeYesterday = today.subtract(const Duration(days: 2));
-  static DateTime threeDaysBefore = today.subtract(const Duration(days: 3));
-  static DateTime fourDaysBefore = today.subtract(const Duration(days: 4));
-  static DateTime fiveDaysBefore = today.subtract(const Duration(days: 5));
-  static DateTime sixDaysBefore = today.subtract(const Duration(days: 6));
-
   /// Returns properly formatted dateUntil property of a [TodoModel]
   static String countUntilTime(Timestamp due) {
     String outputDate;
@@ -107,37 +99,9 @@ class DateTimeFormatting {
   }
 
   /// Returns correct day of the week for [LineChart]'s [LineTooltipItem]
-  static String dayOfTheWeek(int numberOfTheDay) {
-    switch (numberOfTheDay) {
-      case 0:
-        return _getNameOfTheDay(sixDaysBefore.weekday - 1) +
-            ' ' +
-            sixDaysBefore.day.toString();
-      case 1:
-        return _getNameOfTheDay(fiveDaysBefore.weekday - 1) +
-            ' ' +
-            fiveDaysBefore.day.toString();
-      case 2:
-        return _getNameOfTheDay(fourDaysBefore.weekday - 1) +
-            ' ' +
-            fourDaysBefore.day.toString();
-      case 3:
-        return _getNameOfTheDay(threeDaysBefore.weekday - 1) +
-            ' ' +
-            threeDaysBefore.day.toString();
-      case 4:
-        return _getNameOfTheDay(beforeYesterday.weekday - 1) +
-            ' ' +
-            beforeYesterday.day.toString();
-      case 5:
-        return _getNameOfTheDay(yesterday.weekday - 1) +
-            ' ' +
-            yesterday.day.toString();
-      case 6:
-        return _getNameOfTheDay(today.weekday - 1) + ' ' + today.day.toString();
-      default:
-        return '';
-    }
+  static String dayOfTheWeek(int xAxis) {
+    var date = DateTime.now().subtract(Duration(days: 6 - xAxis));
+    return _getNameOfTheDay(date.weekday - 1) + ' ' + date.day.toString();
   }
 
   /// Returns properly formatted date to be more readable (D 00, M 00, Y 0000)

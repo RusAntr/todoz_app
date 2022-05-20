@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:todoz_app/controllers/auth_controller.dart';
 import 'package:todoz_app/controllers/localization_controller.dart';
 import 'package:todoz_app/controllers/user_controller.dart';
-import 'package:todoz_app/ui/ui_export.dart';
+import 'package:todoz_app/ui/widgets/profile_page_menu_items.dart';
 import '../../core/constants/constants.dart';
+import '../ui_export.dart';
 
 class ProfilePage extends GetWidget<UserController> {
   ProfilePage({Key? key}) : super(key: key);
@@ -15,7 +16,6 @@ class ProfilePage extends GetWidget<UserController> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20.0, 15.0, 0.0, 0.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _kindOfAppBar(),
           const SizedBox(height: 10.0),
@@ -97,18 +97,18 @@ class ProfilePage extends GetWidget<UserController> {
           'profilePage'.tr,
           style: AppTextStyles.textStyleTitle,
         ),
-        PopupMenuButton<MenuItem>(
+        PopupMenuButton<CustomMenuItem>(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),
           iconSize: 20.0,
           onSelected: (item) => _onSelectedItem(item),
           itemBuilder: (context) => [
-            ...MenuItems.listOne.map((_buildItem)).toList(),
+            ...ProfilePageMenuItems.listOne.map((_buildItem)).toList(),
             const PopupMenuDivider(
               height: 5.0,
             ),
-            ...MenuItems.listTwo.map((_buildItem)).toList()
+            ...ProfilePageMenuItems.listTwo.map((_buildItem)).toList()
           ],
         ),
       ],
@@ -116,7 +116,7 @@ class ProfilePage extends GetWidget<UserController> {
   }
 }
 
-PopupMenuItem<MenuItem> _buildItem(MenuItem item) => PopupMenuItem(
+PopupMenuItem<CustomMenuItem> _buildItem(CustomMenuItem item) => PopupMenuItem(
       value: item,
       child: Row(
         children: [
@@ -148,7 +148,6 @@ Widget _bottomsheet() {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 15.0,
                   child: Obx(
                     () => Text(
                       _locCon.currentLanguage,
@@ -159,7 +158,6 @@ Widget _bottomsheet() {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10.0),
                 SizedBox(
                   height: 65,
                   width: Get.width,
@@ -182,10 +180,10 @@ Widget _bottomsheet() {
   );
 }
 
-_onSelectedItem(MenuItem item) {
-  if (item == MenuItems.itemChangeLanguage) {
+_onSelectedItem(CustomMenuItem item) {
+  if (item == ProfilePageMenuItems.itemChangeLanguage) {
     return Get.bottomSheet(_bottomsheet());
-  } else if (item == MenuItems.itemSingOut) {
+  } else if (item == ProfilePageMenuItems.itemSingOut) {
     AuthController().signOut();
   }
 }

@@ -86,6 +86,7 @@ class _ProgressWidgetState extends State<ProgressWidget> {
   }
 
   CircularPercentIndicator _progressIndicator(double percentage) {
+    percentage.isNaN ? percentage = 0 : percentage;
     return CircularPercentIndicator(
       radius: 80,
       fillColor: Colors.transparent,
@@ -95,7 +96,7 @@ class _ProgressWidgetState extends State<ProgressWidget> {
       circularStrokeCap: CircularStrokeCap.round,
       animationDuration: 500,
       center: Text(
-        (percentage == 0 || percentage.isNaN)
+        percentage == 0
             ? '0% :('
             : (percentage == 100)
                 ? '100%'

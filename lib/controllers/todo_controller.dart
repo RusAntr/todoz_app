@@ -7,21 +7,83 @@ import '../data/models/models.dart';
 import '../ui/ui_export.dart';
 import 'localization_controller.dart';
 
+enum TodoSortType {
+  byDateCreated,
+  byDateUntil,
+  byDuration,
+  byTimePassed,
+}
+
 class TodoController extends GetxController {
   /// Observable list of [TodoModel]s
   final Rx<List<TodoModel?>> _todoList = Rx<List<TodoModel?>>([]);
-
-  /// Getter for [TodoController]
-  List<TodoModel?> get todos => _todoList.value;
 
   final _firestoreRepository = FirestoreApi();
 
   late String _uid;
 
+  /// Sorts [TodoModel]s in the observable [_todoList]
+  void sort(TodoSortType type, bool ascending) {
+    _todoList.value.sort((a, b) {
+      switch (type) {
+        case TodoSortType.byDateCreated:
+          return ascending
+              ? b!.dateCreated.compareTo(a!.dateCreated)
+              : a!.dateCreated.compareTo(b!.dateCreated);
+        case TodoSortType.byDateUntil:
+          var aa = a?.dateUntil ?? Timestamp(0, 0);
+          var bb = b?.dateUntil ?? Timestamp(0, 0);
+          return ascending ? bb.compareTo(aa) : aa.compareTo(bb);
+        case TodoSortType.byDuration:
+          DateTime aDue = a?.duration?.toDate() ?? DateTime(0);
+          DateTime bDue = b?.duration?.toDate() ?? DateTime(0);
+          Duration aUntil = aDue.difference(
+            DateTime(aDue.year, aDue.month, aDue.day),
+          );
+          Duration bUntil = bDue.difference(
+            DateTime(bDue.year, bDue.month, bDue.day),
+          );
+          return ascending
+              ? bUntil.compareTo(aUntil)
+              : aUntil.compareTo(bUntil);
+        case TodoSortType.byTimePassed:
+          return ascending
+              ? b!.timePassed.compareTo(a!.timePassed)
+              : a!.timePassed.compareTo(b!.timePassed);
+        default:
+          return ascending
+              ? b!.dateCreated.compareTo(a!.dateCreated)
+              : a!.dateCreated.compareTo(b!.dateCreated);
+      }
+    });
+  }
+
+  /// Returns a sorted list of [TodoModel]'s
+  List<TodoModel?> get todos => _todoList.value;
+
+  /// Return a list of all [TodoModel]s that are done
+  List<TodoModel?> get doneTodos =>
+      _todoList.value.where((element) => element!.isDone).toList();
+
+  List<TodoModel?> searchTodos(String searchText) {
+    List<TodoModel?> _foundTodos = [];
+    if (searchText.isNotEmpty) {
+      _foundTodos = doneTodos
+          .where(
+              (element) => element!.content.toLowerCase().contains(searchText))
+          .toList();
+    } else {
+      _foundTodos = doneTodos;
+    }
+    return _foundTodos;
+  }
+
   @override
   onInit() {
     _uid = Get.find<AuthController>().user!.uid;
-    _todoList.bindStream(_firestoreRepository.getAllTodos(_uid));
+    _todoList.bindStream(
+      _firestoreRepository.getAllTodos(uid: _uid),
+    );
     super.onInit();
   }
 
@@ -104,19 +166,14 @@ class TodoController extends GetxController {
   }
 
   /// Returns a list of done/undonde progressive [TodoModel]s
-  List<TodoModel> doneUndondeProgressiveTodos(bool showAllTodos) {
-    List<TodoModel> retVal = [];
-    for (var todo in todos) {
-      if (!showAllTodos && todo!.duration != null && !todo.isDone) {
-        retVal.add(todo);
-      } else if (showAllTodos && todo!.duration != null) {
-        retVal.add(todo);
-      }
-    }
-    return retVal;
+  List<TodoModel> doneUndondeProgressiveTodos(
+      bool showAllTodos, int pageIndex, DateTime date) {
+    return relevantTodoModels(date, pageIndex, showAllTodos)
+        .where((element) => element.duration != null && !element.isDone)
+        .toList();
   }
 
-  /// Returns todos for a specific project
+  /// Returns [TodoModel]s for a specific project
   List<TodoModel> todosInProject(String projectName, bool? done) {
     List<TodoModel> retVal = [];
     for (var todo in todos) {
@@ -130,10 +187,11 @@ class TodoController extends GetxController {
   }
 
   /// Opens a dialog to create new [TodoModel]
-  void openCreateTodo(
-    BuildContext context,
-    bool visible,
-  ) {
+  void openCreateTodo({
+    required BuildContext context,
+    required bool visible,
+    ProjectModel? projectModel,
+  }) {
     showDialog(
       context: context,
       builder: (_) => SimpleDialog(
@@ -143,6 +201,7 @@ class TodoController extends GetxController {
         children: [
           CreateTodo(
             showAllProjects: visible,
+            projectModel: projectModel,
           )
         ],
       ),
@@ -293,35 +352,20 @@ class TodoController extends GetxController {
     return retVal;
   }
 
-  /// Returns the highest number of tasks done in last 7 days
-  double mostTasksOnDay(DateTime today) {
-    List<TodoModel> _sixDaysAgo = [];
-    List<TodoModel> _fiveDaysAgo = [];
-    List<TodoModel> _fourDaysAgo = [];
-    List<TodoModel> _threeDaysAgo = [];
-    List<TodoModel> _beforeYesterday = [];
-    List<TodoModel> _yesterday = [];
-    List<TodoModel> _today = [];
-    List<List<TodoModel>> listOfLists = [
-      _today,
-      _yesterday,
-      _beforeYesterday,
-      _threeDaysAgo,
-      _fourDaysAgo,
-      _fiveDaysAgo,
-      _sixDaysAgo,
-    ];
-
-    for (TodoModel? item in todos) {
-      bool doneTaskHasDate = item!.isDone && item.dateUntil != null;
+  /// Sorts all [TodoModel]s that are done & have a deadline. Returns the highest number of tasks
+  /// done in last 7 days which will be the maximum of a Y axis on a productivity chart
+  double mostTasksOnDay() {
+    List<List<TodoModel>> listOfLists = [[], [], [], [], [], [], []];
+    for (TodoModel? item in doneTodos) {
+      bool doneTaskHasDate = item!.dateUntil != null;
       int i = 0;
-      DateTime day = today;
+      DateTime today = DateTime.now();
       if (doneTaskHasDate) {
         while (i <= 6) {
-          if (item.dateUntil!.toDate().day == day.day) {
+          if (item.dateUntil!.toDate().day == today.day) {
             listOfLists[i].add(item);
           }
-          day = day.subtract(Duration(days: i));
+          today = today.subtract(const Duration(days: 1));
           i++;
         }
       }

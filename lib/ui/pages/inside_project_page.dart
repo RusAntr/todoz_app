@@ -296,7 +296,11 @@ class _InsideProjectPageState extends State<InsideProjectPage>
           color: Colors.white,
           size: 20.0,
         ),
-        onPressed: () => TodoController().openCreateTodo(context, false),
+        onPressed: () => TodoController().openCreateTodo(
+          context: context,
+          visible: false,
+          projectModel: widget.projectModel,
+        ),
       ),
     );
   }

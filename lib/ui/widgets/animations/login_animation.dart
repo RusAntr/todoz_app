@@ -14,7 +14,7 @@ class LogInAnimationState extends State<LogInAnimation> {
   SMIInput<bool>? _isClosingInput;
   Artboard? _logInAnimationArtboard;
 
-  void onTap() {
+  void _onTap() {
     _isClosingInput!.value = false;
     _onTapInput!.value = true;
     if (!_onTapInput!.value && !_onTapInput!.controller.isActive) {
@@ -24,7 +24,7 @@ class LogInAnimationState extends State<LogInAnimation> {
     }
   }
 
-  void onClose() {
+  void _onClose() {
     _isClosingInput!.value = true;
     if (!_isClosingInput!.value && !_isClosingInput!.controller.isActive) {
       _isClosingInput!.controller.isActive = true;
@@ -35,16 +35,14 @@ class LogInAnimationState extends State<LogInAnimation> {
 
   @override
   void dispose() {
-    onClose();
+    _onClose();
     _logInAnimationArtboard!.clearDependencies();
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void initAssets() {
     rootBundle
-        .load('assets/images_animations/login_page/logInAnimation.riv')
+        .load('assets/images_and_animations/login_page/logInAnimation.riv')
         .then(
       (data) {
         final file = RiveFile.import(data);
@@ -67,13 +65,19 @@ class LogInAnimationState extends State<LogInAnimation> {
   }
 
   @override
+  void initState() {
+    initAssets();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 200.0,
       width: 200.0,
       child: GestureDetector(
-        onTap: () => onTap(),
-        onDoubleTap: () => onClose(),
+        onTap: () => _onTap(),
+        onDoubleTap: () => _onClose(),
         child: _logInAnimationArtboard == null
             ? const SizedBox()
             : Rive(

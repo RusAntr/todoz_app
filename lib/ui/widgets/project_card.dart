@@ -1,51 +1,37 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:rive/rive.dart';
 import 'package:todoz_app/controllers/todo_controller.dart';
+import 'package:todoz_app/data/models/models.dart';
 import '../../core/constants/constants.dart';
 
-class ProjectCard extends StatefulWidget {
+class ProjectCard extends StatelessWidget {
   const ProjectCard({
     Key? key,
-    required this.color,
-    required this.projectName,
     required this.height,
     required this.width,
-    required this.cover,
+    required this.projectModel,
   }) : super(key: key);
 
-  final String projectName;
-  final String color;
+  final ProjectModel projectModel;
   final double height;
   final double width;
-  final String cover;
-
-  @override
-  State<ProjectCard> createState() => _ProjectCardState();
-}
-
-class _ProjectCardState extends State<ProjectCard> {
-  late TodoController _todoController;
-
-  @override
-  void initState() {
-    _todoController = Get.find<TodoController>();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    var _todoController = Get.find<TodoController>();
+    double percentage =
+        _todoController.doneTasksInProjectPercent(projectModel.projectName);
     return Column(
       children: [
         AnimatedContainer(
           duration: const Duration(milliseconds: 500),
-          padding: const EdgeInsets.fromLTRB(25.0, 10.0, 5.0, 10.0),
-          height: widget.height,
-          width: widget.width,
+          padding: const EdgeInsets.fromLTRB(25.0, 15.0, 5.0, 15.0),
+          height: height,
+          width: width,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(35.0),
-            color: AppColors().getColor(widget.color).withOpacity(1.0),
+            color: AppColors().getColor(projectModel.color).withOpacity(1.0),
           ),
           child: Stack(
             alignment: Alignment.centerRight,
@@ -53,16 +39,27 @@ class _ProjectCardState extends State<ProjectCard> {
             children: [
               Positioned(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _tasksTitle(),
+                    _tasksTitle(_todoController),
                     SizedBox(
-                      height: widget.height / 40.0,
+                      height: height / 40.0,
                     ),
-                    _progressIndicator(),
+                    Text(
+                      (percentage == 0)
+                          ? '0%'
+                          : (percentage == 1)
+                              ? '100%'
+                              : (percentage * 100).toStringAsFixed(2) + '%',
+                      style: AppTextStyles.blackTitleNormal.copyWith(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white.withOpacity(0.4),
+                      ),
+                    ),
                     SizedBox(
-                      height: widget.height / 80.0,
+                      height: height / 80.0,
                     ),
                     _projectName(),
                   ],
@@ -81,9 +78,10 @@ class _ProjectCardState extends State<ProjectCard> {
       right: 20.0,
       child: SizedBox(
         width: 120.0,
-        child: CachedNetworkImage(
-          imageUrl: widget.cover,
-          alignment: Alignment.centerRight,
+        height: 120.0,
+        child: RepaintBoundary(
+          child: RiveAnimation.asset(
+              'assets/images_and_animations/project_covers/${projectModel.projectCover}_project.riv'),
         ),
       ),
     );
@@ -91,46 +89,21 @@ class _ProjectCardState extends State<ProjectCard> {
 
   Widget _projectName() {
     return SizedBox(
-      width: widget.width / 3.7,
+      width: width / 2,
       child: Text(
-        widget.projectName,
+        projectModel.projectName,
         overflow: TextOverflow.ellipsis,
-        maxLines: 2,
+        maxLines: 3,
         style: AppTextStyles.projectNameProjectCard,
         textAlign: TextAlign.left,
       ),
     );
   }
 
-  Widget _progressIndicator() {
-    double percentage =
-        _todoController.doneTasksInProjectPercent(widget.projectName);
-    return CircularPercentIndicator(
-      circularStrokeCap: CircularStrokeCap.round,
-      radius: 60.0,
-      fillColor: Colors.transparent,
-      backgroundColor: Colors.transparent,
-      animateFromLastPercent: true,
-      animation: true,
-      animationDuration: 500,
-      center: Text(
-        (percentage == 0)
-            ? ''
-            : (percentage == 1)
-                ? '100%'
-                : (percentage * 100).toStringAsFixed(2) + '%',
-        style: AppTextStyles.textStyleProjectChipText,
-      ),
-      progressColor: Colors.white.withOpacity(0.4),
-      lineWidth: 6.0,
-      percent: percentage,
-    );
-  }
-
-  Widget _tasksTitle() {
+  Widget _tasksTitle(TodoController _todoController) {
     return Obx(
       () => Text(
-        _todoController.allTasksInProjectTitle(widget.projectName),
+        _todoController.allTasksInProjectTitle(projectModel.projectName),
         style: AppTextStyles.textStyleWhiteText,
       ),
     );

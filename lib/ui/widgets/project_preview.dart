@@ -1,8 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:rive/rive.dart';
 import 'package:todoz_app/controllers/todo_controller.dart';
+import 'package:todoz_app/core/constants/url_images.dart';
 import '../../core/constants/constants.dart';
 
 class ProjectPreview extends StatefulWidget {
@@ -29,15 +30,43 @@ class ProjectPreview extends StatefulWidget {
 
 class _ProjectPreviewState extends State<ProjectPreview> {
   late TodoController _todoController;
+  late Artboard _animArtboard;
+
+  /// Initializes asset needed for [Rive] and puts an animation on repeat
+  void _initRiveCover() {
+    rootBundle
+        .load(
+            'assets/images_and_animations/project_covers/${UrlImages().selectedCoverKey(widget.cover)}_project.riv')
+        .then(
+      (data) {
+        final file = RiveFile.import(data);
+        final artboard = file.mainArtboard;
+        setState(() {
+          _animArtboard = artboard;
+          _animArtboard.addController(SimpleAnimation('loop'));
+        });
+      },
+    );
+  }
 
   @override
   void initState() {
+    _initRiveCover();
     _todoController = Get.find<TodoController>();
     super.initState();
   }
 
   @override
+  void didUpdateWidget(covariant ProjectPreview oldWidget) {
+    oldWidget.cover != widget.cover ? _initRiveCover() : () {};
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    double percentage = widget.isCreate
+        ? 0
+        : _todoController.doneTasksInProjectPercent(widget.projectName);
     return Column(
       children: [
         AnimatedContainer(
@@ -50,24 +79,37 @@ class _ProjectPreviewState extends State<ProjectPreview> {
             color: AppColors().getColor(widget.color).withOpacity(1.0),
           ),
           child: GetX<TodoController>(
-            builder: (TodoController todoController) => Stack(
-              alignment: Alignment.centerRight,
-              fit: StackFit.expand,
-              children: [
-                Positioned(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _titleTasks(),
-                      _procentIndicator(),
-                      _projectName(),
-                    ],
+            builder: (_todoController) {
+              return Stack(
+                alignment: Alignment.centerRight,
+                fit: StackFit.expand,
+                children: [
+                  Positioned(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _titleTasks(),
+                        Text(
+                          (percentage == 0)
+                              ? '0%'
+                              : (percentage == 1)
+                                  ? '100%'
+                                  : (percentage * 100).toStringAsFixed(2) + '%',
+                          style: AppTextStyles.blackTitleNormal.copyWith(
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white.withOpacity(0.4),
+                          ),
+                        ),
+                        _projectName(),
+                      ],
+                    ),
                   ),
-                ),
-                _projectCover(),
-              ],
-            ),
+                  _projectCover(),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -83,11 +125,9 @@ class _ProjectPreviewState extends State<ProjectPreview> {
     return Positioned(
       right: 20.0,
       child: SizedBox(
+        height: 110.0,
         width: 110.0,
-        child: CachedNetworkImage(
-          imageUrl: widget.cover,
-          alignment: Alignment.centerRight,
-        ),
+        child: Rive(artboard: _animArtboard),
       ),
     );
   }
@@ -101,36 +141,6 @@ class _ProjectPreviewState extends State<ProjectPreview> {
         maxLines: 2,
         style: AppTextStyles.projectNameProjectCard.copyWith(fontSize: 16.0),
         textAlign: TextAlign.left,
-      ),
-    );
-  }
-
-  Widget _procentIndicator() {
-    double percentage = widget.isCreate
-        ? 0.5
-        : _todoController.doneTasksInProjectPercent(widget.projectName);
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: CircularPercentIndicator(
-        circularStrokeCap: CircularStrokeCap.round,
-        radius: 55.0,
-        fillColor: Colors.transparent,
-        backgroundColor: Colors.transparent,
-        animateFromLastPercent: true,
-        animation: true,
-        animationDuration: 500,
-        center: Text(
-          (percentage == 0)
-              ? ''
-              : (percentage == 1)
-                  ? '100%'
-                  : (percentage * 100).toStringAsFixed(2) + '%',
-          style:
-              AppTextStyles.textStyleProjectChipText.copyWith(fontSize: 10.5),
-        ),
-        progressColor: Colors.white.withOpacity(0.4),
-        lineWidth: 6.0,
-        percent: percentage,
       ),
     );
   }

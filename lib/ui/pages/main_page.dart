@@ -5,6 +5,7 @@ import 'package:todoz_app/ui/pages/productivity_page.dart';
 import 'package:todoz_app/ui/pages/profile_page.dart';
 import 'package:todoz_app/ui/pages/projects_page.dart';
 import '../../core/constants/constants.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -92,7 +93,7 @@ class _MainPageState extends State<MainPage> {
             ),
           ],
         ),
-        body: IndexedStack(
+        body: LazyLoadIndexedStack(
           index: _currentIndex,
           children: _pages,
         ),

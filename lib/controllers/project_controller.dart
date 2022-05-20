@@ -6,12 +6,19 @@ import 'package:todoz_app/core/custom_snackbars.dart';
 import 'package:todoz_app/ui/ui_export.dart';
 import '../data/models/models.dart';
 
+enum ProjectSortType {
+  byDateCreated,
+  byName,
+}
+
 class ProjectController extends GetxController {
   /// Observable list of [ProjectModel]s
-  final Rx<List<ProjectModel?>> _projectList = Rx<List<ProjectModel?>>([]);
+  final Rx<List<ProjectModel?>> _projectsList = Rx<List<ProjectModel?>>([]);
 
-  /// Getter for [ProjectController]
-  List<ProjectModel?> get projects => _projectList.value;
+  /// Returns a sorted list of [ProjectModel]'s
+  List<ProjectModel?> get projects {
+    return _projectsList.value;
+  }
 
   final FirestoreApi _firestoreRepository = FirestoreApi();
   late String _uid;
@@ -19,14 +26,49 @@ class ProjectController extends GetxController {
   @override
   onInit() {
     _uid = Get.find<AuthController>().user!.uid;
-    _projectList.bindStream(FirestoreApi().getProjects(_uid));
+    _projectsList.bindStream(FirestoreApi().getProjects(_uid));
     super.onInit();
   }
 
   @override
   onClose() {
-    _projectList.close();
+    _projectsList.close();
     super.onClose();
+  }
+
+  /// Sorts [ProjectModel]s in the observable [_projectsList]
+  void sort(ProjectSortType sortType, bool isAscending) {
+    _projectsList.value.sort(
+      (a, b) {
+        switch (sortType) {
+          case ProjectSortType.byDateCreated:
+            return isAscending
+                ? b!.dateCreated.compareTo(a!.dateCreated)
+                : a!.dateCreated.compareTo(b!.dateCreated);
+          case ProjectSortType.byName:
+            return isAscending
+                ? b!.projectName.compareTo(a!.projectName)
+                : a!.projectName.compareTo(b!.projectName);
+          default:
+            return isAscending
+                ? b!.dateCreated.compareTo(a!.dateCreated)
+                : a!.dateCreated.compareTo(b!.dateCreated);
+        }
+      },
+    );
+  }
+
+  List<ProjectModel?> searchProjects(String searchText) {
+    List<ProjectModel?> _foundProjects = [];
+    if (searchText.isNotEmpty) {
+      _foundProjects = projects
+          .where((element) =>
+              element!.projectName.toLowerCase().contains(searchText))
+          .toList();
+    } else {
+      _foundProjects = projects;
+    }
+    return _foundProjects;
   }
 
   /// Returns project's id for [TodoModel]

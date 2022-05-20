@@ -6,6 +6,7 @@ import 'package:todoz_app/controllers/user_controller.dart';
 import 'package:todoz_app/ui/pages/archive_page.dart';
 import 'package:todoz_app/ui/ui_export.dart';
 import '../../core/constants/constants.dart';
+import '../widgets/profile_page_menu_items.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -21,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   late List<Widget> progressWidgets;
   late final PageController _pageController;
   late bool _showAllTodos;
+  bool isAscending = false;
 
   @override
   void initState() {
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> {
     _date = DateTime.now();
     _showAllTodos = false;
     _pageIndex = 1;
-    _pageController = PageController(initialPage: 1, keepPage: false);
+    _pageController = PageController(initialPage: 1, keepPage: true);
     super.initState();
   }
 
@@ -74,40 +76,39 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 7),
             PageViewIndicators(pageIndex: _pageIndex),
             _todoTitleIndicator(),
-            const SizedBox(height: 20),
             _todoCards(),
             const SizedBox(height: 20),
             _inProgressTitleIndicator(),
-            inProgressCards(),
+            inProgressTodoCards(),
           ],
         ),
       ],
     );
   }
 
-  Widget inProgressCards() {
-    return Obx(
-      () => _todoController.doneUndondeProgressiveTodos(_showAllTodos).isEmpty
+  GetX inProgressTodoCards() {
+    return GetX<TodoController>(builder: (_todoController) {
+      var progressivesList = _todoController.doneUndondeProgressiveTodos(
+        _showAllTodos,
+        _pageIndex,
+        _date,
+      );
+      return progressivesList.isEmpty
           ? const EmptyTodo()
           : ListView.builder(
               addAutomaticKeepAlives: false,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.vertical,
-              itemCount: _todoController
-                  .doneUndondeProgressiveTodos(_showAllTodos)
-                  .length,
+              itemCount: progressivesList.length,
               itemBuilder: (_, index) {
                 return TodoProgressiveCard(
-                  key: Key(_todoController
-                      .doneUndondeProgressiveTodos(_showAllTodos)[index]
-                      .todoId),
-                  todoModel: _todoController
-                      .doneUndondeProgressiveTodos(_showAllTodos)[index],
+                  key: Key(progressivesList[index].todoId),
+                  todoModel: progressivesList[index],
                 );
               },
-            ),
-    );
+            );
+    });
   }
 
   Widget _inProgressTitleIndicator() {
@@ -131,7 +132,8 @@ class _HomePageState extends State<HomePage> {
               child: Obx(
                 () => Text(
                   _todoController
-                      .doneUndondeProgressiveTodos(_showAllTodos)
+                      .doneUndondeProgressiveTodos(
+                          _showAllTodos, _pageIndex, _date)
                       .length
                       .toString(),
                   style: AppTextStyles.textStyleSmallRedText,
@@ -147,38 +149,20 @@ class _HomePageState extends State<HomePage> {
   Widget _todoCards() {
     return GetX<TodoController>(
       builder: (_) {
-        if (_todoController
-            .relevantTodoModels(
-              _date,
-              _pageIndex,
-              _showAllTodos,
-            )
+        var undoneTodos = _todoController
+            .relevantTodoModels(_date, _pageIndex, _showAllTodos)
             .where((element) => !element.isDone)
-            .toList()
-            .isNotEmpty) {
+            .toList();
+        if (undoneTodos.isNotEmpty) {
           return SizedBox(
             height: 150.0,
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
-              itemCount: _todoController
-                  .relevantTodoModels(
-                    _date,
-                    _pageIndex,
-                    _showAllTodos,
-                  )
-                  .where((element) => !element.isDone)
-                  .length,
+              itemCount: undoneTodos.length,
               itemBuilder: (_, index) {
                 return TodoCard(
-                  todoModel: _todoController
-                      .relevantTodoModels(
-                        _date,
-                        _pageIndex,
-                        _showAllTodos,
-                      )
-                      .where((element) => !element.isDone)
-                      .toList()[index],
+                  todoModel: undoneTodos[index],
                 );
               },
             ),
@@ -194,7 +178,7 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 7.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             'toDo'.tr,
@@ -212,11 +196,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (_) {
                   return Text(
                     _todoController
-                        .relevantTodoModels(
-                          _date,
-                          _pageIndex,
-                          _showAllTodos,
-                        )
+                        .relevantTodoModels(_date, _pageIndex, _showAllTodos)
                         .where((element) => !element.isDone)
                         .length
                         .toString(),
@@ -245,10 +225,69 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          PopupMenuButton(
+            enableFeedback: true,
+            splashRadius: 15,
+            tooltip: 'sort'.tr,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            icon: const Icon(
+              Icons.filter_list,
+              color: Colors.black45,
+            ),
+            onSelected: _onSelectedItem,
+            itemBuilder: (context) => [
+              _buildItem(CustomMenuItem(
+                  text: 'sortDateCreated'.tr,
+                  icon: Icons.calendar_today_outlined,
+                  todoSortType: TodoSortType.byDateCreated)),
+              _buildItem(CustomMenuItem(
+                  text: 'sortDateUntil'.tr,
+                  icon: Icons.access_alarm_rounded,
+                  todoSortType: TodoSortType.byDateUntil)),
+              _buildItem(CustomMenuItem(
+                  text: 'sortTimePassed'.tr,
+                  icon: Icons.hourglass_empty_rounded,
+                  todoSortType: TodoSortType.byTimePassed)),
+              _buildItem(CustomMenuItem(
+                  text: 'sortDuration'.tr,
+                  icon: Icons.schedule_rounded,
+                  todoSortType: TodoSortType.byDuration)),
+            ],
+          )
         ],
       ),
     );
   }
+
+  _onSelectedItem(CustomMenuItem item) {
+    setState(() {});
+    for (var sortType in TodoSortType.values) {
+      item.todoSortType == sortType
+          ? _todoController.sort(sortType, isAscending)
+          : () {};
+    }
+    isAscending = isAscending ? false : true;
+  }
+
+  PopupMenuItem<CustomMenuItem> _buildItem(CustomMenuItem item) =>
+      PopupMenuItem(
+        value: item,
+        child: Row(
+          children: [
+            Icon(
+              item.icon,
+              size: 15.0,
+            ),
+            const SizedBox(width: 8.0),
+            Text(
+              item.text,
+              style: AppTextStyles.dateTimeItem.copyWith(fontSize: 12.0),
+            )
+          ],
+        ),
+      );
 
   Widget _progressWidgets(double _width, double _height) {
     return SizedBox(
@@ -298,7 +337,7 @@ class _HomePageState extends State<HomePage> {
             highlightColor: Colors.transparent,
             icon: const Icon(EvaIcons.archiveOutline),
             iconSize: 30,
-            onPressed: () => Get.to(() => ArchivePage()),
+            onPressed: () => Get.to(() => const ArchivePage()),
           )
         ],
       ),
@@ -312,7 +351,9 @@ class _HomePageState extends State<HomePage> {
       splashColor: AppColors.darkPurple,
       elevation: 30.0,
       backgroundColor: AppColors.mainPurple,
-      onPressed: () => _todoController.openCreateTodo(context, true),
+      onPressed: () {
+        _todoController.openCreateTodo(context: context, visible: true);
+      },
       child: const Icon(
         Icons.add_rounded,
       ),

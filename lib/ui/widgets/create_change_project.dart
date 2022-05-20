@@ -49,8 +49,8 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
         ? _colors[0]
         : AppColors().getColor(widget.projectModel!.color);
     _pickedCover = widget.isCreate
-        ? UrlImages().images[0]
-        : widget.projectModel!.projectCover;
+        ? UrlImages().images.values.toList()[0]
+        : UrlImages().selectedCoverValue(widget.projectModel!.projectCover);
     super.initState();
   }
 
@@ -81,7 +81,7 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              !widget.isCreate ? _deleteButton() : Container(),
+              !widget.isCreate ? _deleteButton() : const SizedBox(),
               _createChangeButton(),
             ],
           ),
@@ -151,9 +151,11 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
 
   CoverPicker _coverPicker() {
     return CoverPicker(
-      availableCovers: UrlImages().images,
+      availableCovers: UrlImages().images.values.toList(),
       initialCover: _pickedCover,
-      onSelectCover: (String url) => setState(() => _pickedCover = url),
+      onSelectCover: (String url) => setState(
+        () => _pickedCover = url,
+      ),
     );
   }
 
@@ -210,12 +212,13 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
         top: 10,
       ),
       child: ProjectPreview(
-          projectName: _projectName,
-          color: _pickedColor.value.toString(),
-          height: 180,
-          width: Get.width,
-          cover: _pickedCover,
-          isCreate: widget.isCreate),
+        projectName: _projectName,
+        color: _pickedColor.value.toString(),
+        height: 180,
+        width: Get.width,
+        cover: _pickedCover,
+        isCreate: widget.isCreate,
+      ),
     );
   }
 
@@ -249,12 +252,12 @@ class _CreateChangeProjectState extends State<CreateChangeProject> {
       _projectController.addProject(
         controller: _textEditingController,
         color: _pickedColor,
-        projectCover: _pickedCover,
+        projectCover: UrlImages().selectedCoverKey(_pickedCover),
       );
     } else {
       _projectController.updateProject(
         color: _pickedColor,
-        projectCover: _pickedCover,
+        projectCover: UrlImages().selectedCoverKey(_pickedCover),
         projectName: _projectName,
         projectId: widget.projectModel!.projectId,
         todoModels: widget.todoModels,

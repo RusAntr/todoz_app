@@ -6,18 +6,18 @@ class CoverPicker extends StatefulWidget {
   const CoverPicker({
     Key? key,
     this.onSelectCover,
-    this.availableCovers,
-    this.initialCover,
+    required this.availableCovers,
+    required this.initialCover,
   }) : super(key: key);
 
   /// This function sends the selected cover to outside
   final Function? onSelectCover;
 
   /// List of pickable covers
-  final List<String>? availableCovers;
+  final List<String> availableCovers;
 
   /// The default picked cover
-  final String? initialCover;
+  final String initialCover;
 
   @override
   State<CoverPicker> createState() => _CoverPickerState();
@@ -28,7 +28,7 @@ class _CoverPickerState extends State<CoverPicker> {
 
   @override
   void initState() {
-    _pickedCover = widget.initialCover!;
+    _pickedCover = widget.initialCover;
     super.initState();
   }
 
@@ -40,9 +40,9 @@ class _CoverPickerState extends State<CoverPicker> {
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
-        itemCount: widget.availableCovers!.length,
+        itemCount: widget.availableCovers.length,
         itemBuilder: (_, index) {
-          final itemCover = widget.availableCovers![index];
+          final itemCover = widget.availableCovers[index];
           return Padding(
             padding: (index == 0)
                 ? const EdgeInsets.only(left: 15.0, right: 10.0)
@@ -52,14 +52,16 @@ class _CoverPickerState extends State<CoverPicker> {
             child: GestureDetector(
               onTap: () => setState(
                 () {
-                  widget.onSelectCover!(itemCover);
                   _pickedCover = itemCover;
+                  widget.onSelectCover!(itemCover);
                 },
               ),
               child: Container(
+                height: 100,
+                width: 100,
                 alignment: Alignment.center,
                 child: CachedNetworkImage(
-                  imageUrl: widget.availableCovers![index],
+                  imageUrl: widget.availableCovers[index],
                   height: itemCover == _pickedCover ? 100.0 : 80.0,
                   width: itemCover == _pickedCover ? 100.0 : 80.0,
                   placeholder: (context, _) => SizedBox(

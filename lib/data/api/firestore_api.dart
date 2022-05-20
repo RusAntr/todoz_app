@@ -194,7 +194,9 @@ class FirestoreApi {
   }
 
   /// Returns a stream of a list of [TodoModel]s
-  Stream<List<TodoModel>> getAllTodos(String uid) {
+  Stream<List<TodoModel>> getAllTodos({
+    required String uid,
+  }) {
     return _firestore
         .collectionGroup('todos')
         .where('userId', isEqualTo: uid)
@@ -205,6 +207,9 @@ class FirestoreApi {
         for (var element in query.docs) {
           retVal.add(TodoModel.fromDocumentSnapshot(element));
         }
+        retVal.sort(
+          (a, b) => b.dateCreated.compareTo(a.dateCreated),
+        );
         return retVal;
       },
     );

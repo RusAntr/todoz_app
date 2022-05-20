@@ -85,6 +85,12 @@ class AppTranslations extends Translations {
           'deletedSuccessfully': 'Deleted Successfully',
           'clickUndo': 'Click to undo',
           'undo': 'undo',
+          'sort': 'sort',
+          'sortDateCreated': 'Creation date',
+          'sortDateUntil': 'Deadline',
+          'sortTimePassed': 'Time spent',
+          'sortDuration': 'Duration',
+          'sortName': 'Name',
         },
         'ru': {
           'title': 'Список дел',
@@ -168,6 +174,12 @@ class AppTranslations extends Translations {
           'deletedSuccessfully': 'Успешно удалено',
           'clickUndo': 'Нажмите, чтобы отменить',
           'undo': 'отмена',
+          'sort': 'сортировать',
+          'sortDateCreated': 'Дата создания',
+          'sortDateUntil': 'Дэдлайн',
+          'sortTimePassed': 'Потрачено времени',
+          'sortDuration': 'Продолжительность',
+          'sortName': 'Название',
         },
         'zh': {
           'title': '标题',
@@ -251,6 +263,12 @@ class AppTranslations extends Translations {
           'deletedSuccessfully': '删除成功',
           'clickUndo': '点击撤销',
           'undo': '撤消',
+          'sort': '排序',
+          'sortDateCreated': '创建日期',
+          'sortDateUntil': '最后期限',
+          'sortTimePassed': '所花费的时间',
+          'sortDuration': '持续时间',
+          'sortName': '按名字',
         }
       };
 }

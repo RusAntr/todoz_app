@@ -14,41 +14,23 @@ class ProductivityPage extends GetWidget<TodoController> {
   ];
   final _projectController = Get.find<ProjectController>();
 
-  String _tasksPluralLabel(int numberOfTasks) {
-    numberOfTasks = numberOfTasks % 100;
+  String _pluralRussianLabel(int number, bool isTask) {
+    number = number % 100;
 
-    if (numberOfTasks >= 11 && numberOfTasks <= 19) {
-      return 'tasksPlural'.tr;
+    if (number >= 11 && number <= 19) {
+      return isTask ? 'tasksPlural'.tr : 'projectsPlural'.tr;
     } else {
-      int i = numberOfTasks % 10;
+      int i = number % 10;
       switch (i) {
         case 1:
-          return 'tasksPlural1'.tr;
+          return isTask ? 'tasksPlural1'.tr : 'projectsPlural1'.tr;
         case 2:
         case 3:
         case 4:
-          return 'tasksPlural234'.tr;
+          return isTask ? 'tasksPlural234'.tr : 'projectsPlural234'.tr;
       }
     }
-    return 'tasksPlural'.tr;
-  }
-
-  String _projectsPluralLabel(int numberOfProjects) {
-    numberOfProjects = numberOfProjects % 100;
-    if (numberOfProjects >= 11 && numberOfProjects <= 19) {
-      return 'projectsPlural'.tr;
-    } else {
-      int i = numberOfProjects % 10;
-      switch (i) {
-        case 1:
-          return 'projectsPlural1'.tr;
-        case 2:
-        case 3:
-        case 4:
-          return 'projectsPlural234'.tr;
-      }
-    }
-    return 'projectsPlural'.tr;
+    return isTask ? 'tasksPlural'.tr : 'projectsPlural'.tr;
   }
 
   String _congrats(double tasksDoneThisWeek) {
@@ -66,22 +48,22 @@ class ProductivityPage extends GetWidget<TodoController> {
     return 'fantastic'.tr;
   }
 
-  List<LineTooltipItem> _getToolTipItems(List<LineBarSpot> touchedSpots) {
+  List<LineTooltipItem> _getToolTipItems(List<LineBarSpot> spots) {
     List<LineTooltipItem> _items = [];
-    for (var item in touchedSpots) {
-      LineTooltipItem itemm = LineTooltipItem(
+    for (var item in spots) {
+      LineTooltipItem tooltipItem = LineTooltipItem(
         '${item.y.toInt().toString()} ',
         AppTextStyles.whiteTitleNormal.copyWith(fontWeight: FontWeight.bold),
         children: [
           TextSpan(
-              text: _tasksPluralLabel(item.y.toInt()) + '\n',
+              text: _pluralRussianLabel(item.y.toInt(), true) + '\n',
               style: AppTextStyles.whiteTitleNormal),
           TextSpan(
               text: DateTimeFormatting.dayOfTheWeek(item.x.toInt()),
               style: AppTextStyles.whiteTitleNormal),
         ],
       );
-      _items.add(itemm);
+      _items.add(tooltipItem);
     }
     return _items;
   }
@@ -106,7 +88,7 @@ class ProductivityPage extends GetWidget<TodoController> {
               () => Center(
                 child: Text(
                     _congrats(
-                      controller.mostTasksOnDay(DateTimeFormatting.today),
+                      controller.mostTasksOnDay(),
                     ),
                     style: AppTextStyles.giantTitle),
               ),
@@ -143,9 +125,7 @@ class ProductivityPage extends GetWidget<TodoController> {
                 gridData: FlGridData(show: false),
                 minX: 0,
                 maxX: 6.0,
-                maxY: controller
-                    .mostTasksOnDay(DateTimeFormatting.today)
-                    .truncateToDouble(),
+                maxY: controller.mostTasksOnDay().roundToDouble(),
                 minY: -0.2,
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
@@ -174,14 +154,16 @@ class ProductivityPage extends GetWidget<TodoController> {
           Obx(
             () => NumberOfTasks(
               controller: controller,
-              text: _tasksPluralLabel(
-                  controller.todos.where((element) => element!.isDone).length),
+              text: _pluralRussianLabel(
+                  controller.todos.where((element) => element!.isDone).length,
+                  true),
             ),
           ),
           Obx(
             () => NumberOfProjects(
               controller: _projectController,
-              func: _projectsPluralLabel(_projectController.projects.length),
+              text: _pluralRussianLabel(
+                  _projectController.projects.length, false),
             ),
           ),
         ],
@@ -189,50 +171,34 @@ class ProductivityPage extends GetWidget<TodoController> {
     );
   }
 
+  List<FlSpot> getSpots() {
+    List<FlSpot> spots = [];
+    int i = 0;
+    while (i <= 6) {
+      spots.add(FlSpot(
+          6 - i.toDouble(),
+          controller
+              .doneTasksOnDay(DateTime.now().subtract(Duration(days: i)))));
+      i++;
+    }
+    return spots.reversed.toList();
+  }
+
   LineChartBarData _lineChartBarData() {
     return LineChartBarData(
-      dotData: FlDotData(show: true),
-      isStrokeCapRound: true,
-      curveSmoothness: .3,
-      preventCurveOverShooting: true,
-      isCurved: true,
-      colors: _gradientColors,
-      barWidth: .0,
-      belowBarData: BarAreaData(
-          show: true,
-          colors:
-              _gradientColors.map((color) => color.withOpacity(0.2)).toList()),
-      spots: [
-        FlSpot(
-          0,
-          controller.doneTasksOnDay(DateTimeFormatting.sixDaysBefore),
-        ),
-        FlSpot(
-          1,
-          controller.doneTasksOnDay(DateTimeFormatting.fiveDaysBefore),
-        ),
-        FlSpot(
-          2,
-          controller.doneTasksOnDay(DateTimeFormatting.fourDaysBefore),
-        ),
-        FlSpot(
-          3,
-          controller.doneTasksOnDay(DateTimeFormatting.threeDaysBefore),
-        ),
-        FlSpot(
-          4,
-          controller.doneTasksOnDay(DateTimeFormatting.beforeYesterday),
-        ),
-        FlSpot(
-          5,
-          controller.doneTasksOnDay(DateTimeFormatting.yesterday),
-        ),
-        FlSpot(
-          6,
-          controller.doneTasksOnDay(DateTimeFormatting.today),
-        ),
-      ],
-    );
+        dotData: FlDotData(show: true),
+        isStrokeCapRound: true,
+        curveSmoothness: .3,
+        preventCurveOverShooting: true,
+        isCurved: true,
+        colors: _gradientColors,
+        barWidth: .0,
+        belowBarData: BarAreaData(
+            show: true,
+            colors: _gradientColors
+                .map((color) => color.withOpacity(0.2))
+                .toList()),
+        spots: getSpots());
   }
 }
 
@@ -283,12 +249,12 @@ class NumberOfTasks extends StatelessWidget {
 class NumberOfProjects extends StatelessWidget {
   const NumberOfProjects({
     Key? key,
-    required this.func,
+    required this.text,
     required this.controller,
   }) : super(key: key);
 
   final ProjectController controller;
-  final String func;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -308,7 +274,7 @@ class NumberOfProjects extends StatelessWidget {
             style: AppTextStyles.numberOfTasksProductivity,
           ),
           Text(
-            func,
+            text,
             style: AppTextStyles.numberOfTasksLabelProductivity,
           ),
           const SizedBox(height: 5.0),

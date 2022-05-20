@@ -16,8 +16,10 @@ class TodoProgressiveCard extends StatefulWidget {
   const TodoProgressiveCard({
     Key? key,
     required this.todoModel,
+    this.projectColor,
   }) : super(key: key);
   final TodoModel todoModel;
+  final Color? projectColor;
 
   @override
   TodoProgressiveCardState createState() => TodoProgressiveCardState();
@@ -53,7 +55,6 @@ class TodoProgressiveCardState extends State<TodoProgressiveCard>
 
   @override
   void dispose() {
-    // stopTimer();
     _animationController.dispose();
     super.dispose();
   }
@@ -64,11 +65,11 @@ class TodoProgressiveCardState extends State<TodoProgressiveCard>
       swipeThreshold: .2,
       direction: SwipeDirection.horizontal,
       key: Key(widget.todoModel.todoId),
-      behavior: HitTestBehavior.opaque,
+      behavior: HitTestBehavior.translucent,
       backgroundBuilder: (context, direction, _) => _tileBackground(direction),
-      color: Colors.white,
+      color: widget.todoModel.isDone ? Colors.amber : Colors.white,
       borderRadius: 25.0,
-      horizontalPadding: 15.0,
+      horizontalPadding: 10.0,
       verticalPadding: 10.0,
       onSwiped: (SwipeDirection direction) => _onSwipe(direction),
       shadow: BoxShadow(
@@ -76,26 +77,35 @@ class TodoProgressiveCardState extends State<TodoProgressiveCard>
         blurRadius: 10.0,
         offset: const Offset(.0, 10.0),
       ),
+      child: _tileForeground(Get.width),
+    );
+  }
+
+  Widget _tileForeground(double width) {
+    return AnimatedContainer(
+      constraints: BoxConstraints(
+          minHeight: 40, maxHeight: 100, minWidth: 100, maxWidth: width),
+      duration: const Duration(milliseconds: 300),
+      color: widget.todoModel.isDone ? widget.projectColor : Colors.white,
       child: Padding(
-        padding: const EdgeInsets.only(
-          right: 25.0,
-          left: 25.0,
-          bottom: 10.0,
-          top: 10.0,
-        ),
+        padding: const EdgeInsets.only(right: 25.0, left: 25.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   widget.todoModel.projectName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.projectNameProgressive,
+                  style: widget.todoModel.isDone
+                      ? AppTextStyles.projectNameProgressive
+                          .copyWith(color: Colors.white.withOpacity(0.8))
+                      : AppTextStyles.projectNameProgressive,
                 ),
-                const SizedBox(height: 5.0),
+                const SizedBox(height: 10.0),
                 SizedBox(
                   width: Get.width / 1.65,
                   child: SingleChildScrollView(
@@ -103,90 +113,115 @@ class TodoProgressiveCardState extends State<TodoProgressiveCard>
                     scrollDirection: Axis.vertical,
                     child: SelectableText(
                       widget.todoModel.content,
-                      style: AppTextStyles.todoContentProgressive,
+                      maxLines: 2,
+                      style: widget.todoModel.isDone
+                          ? AppTextStyles.todoContentProgressive
+                              .copyWith(color: Colors.white)
+                          : AppTextStyles.todoContentProgressive,
                     ),
                   ),
                 ),
-                const SizedBox(height: 5.0),
+                const SizedBox(height: 10.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       DateTimeFormatting.toDoProgressDuration(_duration) +
                           '  |  ',
-                      style: AppTextStyles.timePassedVsDuration,
+                      style: widget.todoModel.isDone
+                          ? AppTextStyles.timePassedVsDuration
+                              .copyWith(color: Colors.white.withOpacity(0.7))
+                          : AppTextStyles.timePassedVsDuration,
                     ),
                     Text(
                       DateTimeFormatting.howMuchTimePassed(_timePassed),
-                      style: AppTextStyles.timePassedVsDuration,
+                      style: widget.todoModel.isDone
+                          ? AppTextStyles.timePassedVsDuration
+                              .copyWith(color: Colors.white.withOpacity(0.7))
+                          : AppTextStyles.timePassedVsDuration,
                     ),
                     const SizedBox(width: 5.0),
                   ],
                 ),
               ],
             ),
-            GestureDetector(
-              onTap: () => _timerOnOff(),
-              child: _percentIndicator(),
-            ),
+            widget.todoModel.isDone
+                ? Text(
+                    'taskDone'.tr,
+                    style: AppTextStyles.textStyleProjectNamePreview,
+                  )
+                : GestureDetector(
+                    onTap: () => _timerOnOff(),
+                    child: _percentIndicator(),
+                  ),
           ],
         ),
       ),
     );
   }
 
-  Widget _tileBackground(SwipeDirection direction) {
-    if (direction == SwipeDirection.endToStart) {
-      if (!widget.todoModel.isDone) {
-        return Container(
-          padding: const EdgeInsets.only(right: 25),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            color: Colors.green,
-          ),
-          alignment: Alignment.centerRight,
-          child: const Icon(
-            EvaIcons.doneAll,
-            color: Colors.white,
-          ),
-        );
-      } else {
-        return Container(
-          padding: const EdgeInsets.only(right: 25),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            color: Colors.red,
-          ),
-          alignment: Alignment.centerRight,
-          child: const Icon(
-            EvaIcons.undo,
-            color: Colors.white,
-          ),
-        );
-      }
-    } else if (direction == SwipeDirection.startToEnd) {
+  Widget _buildBackgroundSwipeLeft() {
+    if (!widget.todoModel.isDone) {
       return Container(
-        padding: const EdgeInsets.only(left: 25),
+        padding: const EdgeInsets.only(right: 25),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          color: Colors.green,
+        ),
+        alignment: Alignment.centerRight,
+        child: const Icon(
+          EvaIcons.doneAll,
+          color: Colors.white,
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.only(right: 25),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
           color: Colors.red,
         ),
-        alignment: Alignment.centerLeft,
-        height: 20,
-        width: 20,
+        alignment: Alignment.centerRight,
         child: const Icon(
-          EvaIcons.trash2Outline,
+          EvaIcons.undo,
           color: Colors.white,
         ),
       );
     }
-    return Container();
+  }
+
+  Widget _buildBackgroundSwipeRight() {
+    return Container(
+      padding: const EdgeInsets.only(left: 25),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        color: Colors.red,
+      ),
+      alignment: Alignment.centerLeft,
+      height: 20,
+      width: 20,
+      child: const Icon(
+        EvaIcons.trash2Outline,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _tileBackground(SwipeDirection direction) {
+    switch (direction) {
+      case SwipeDirection.endToStart:
+        return _buildBackgroundSwipeLeft();
+      case SwipeDirection.startToEnd:
+        return _buildBackgroundSwipeRight();
+      default:
+        return Container();
+    }
   }
 
   CircularPercentIndicator _percentIndicator() {
     return CircularPercentIndicator(
       radius: 75,
-      fillColor: Colors.white,
+      fillColor: Colors.transparent,
       backgroundColor: Colors.black.withOpacity(.05),
       animateFromLastPercent: true,
       animation: true,
@@ -269,27 +304,33 @@ class TodoProgressiveCardState extends State<TodoProgressiveCard>
     _timer.isActive ? _stopTimer() : _starTimer();
   }
 
+  void _restoreTodo() {
+    TodoModel deletedTodo = widget.todoModel.copyWith();
+    _todoController.deleteTodo(
+      todoId: widget.todoModel.todoId,
+      projectId: _projectController.getProjectId(widget.todoModel),
+    );
+    CustomSnackbars.undoDeleteTodo(
+      title: 'deletedSuccessfully'.tr,
+      message: 'clickUndo'.tr,
+      deletedTodo: deletedTodo,
+      projectId: _projectController.getProjectId(deletedTodo),
+    );
+  }
+
   void _onSwipe(SwipeDirection direction) {
-    if (direction == SwipeDirection.endToStart) {
-      _todoController.updateTodo(
-        newValue: widget.todoModel.isDone ? false : true,
-        todoId: widget.todoModel.todoId,
-        projectId: _projectController.getProjectId(widget.todoModel),
-        projectName: widget.todoModel.projectName,
-        timePassed: widget.todoModel.timePassed,
-      );
-    } else if (direction == SwipeDirection.startToEnd) {
-      TodoModel deletedTodo = widget.todoModel.copyWith();
-      _todoController.deleteTodo(
-        todoId: widget.todoModel.todoId,
-        projectId: _projectController.getProjectId(widget.todoModel),
-      );
-      CustomSnackbars.undoDeleteTodo(
-        title: 'deletedSuccessfully'.tr,
-        message: 'clickUndo'.tr,
-        deletedTodo: deletedTodo,
-        projectId: _projectController.getProjectId(deletedTodo),
-      );
+    switch (direction) {
+      case SwipeDirection.endToStart:
+        return _todoController.updateTodo(
+          newValue: widget.todoModel.isDone ? false : true,
+          todoId: widget.todoModel.todoId,
+          projectId: _projectController.getProjectId(widget.todoModel),
+          projectName: widget.todoModel.projectName,
+          timePassed: widget.todoModel.timePassed,
+        );
+      case SwipeDirection.startToEnd:
+        return _restoreTodo();
+      default:
     }
   }
 }

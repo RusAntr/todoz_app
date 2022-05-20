@@ -40,11 +40,9 @@ class SignUpAnimationState extends State<SignUpAnimation> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void initAssets() {
     rootBundle
-        .load('assets/images_animations/signup_page/signUpAnimation.riv')
+        .load('assets/images_and_animations/signup_page/signUpAnimation.riv')
         .then(
       (data) {
         final file = RiveFile.import(data);
@@ -64,6 +62,12 @@ class SignUpAnimationState extends State<SignUpAnimation> {
         );
       },
     );
+  }
+
+  @override
+  void initState() {
+    initAssets();
+    super.initState();
   }
 
   @override

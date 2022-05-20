@@ -32,9 +32,8 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
     return widget.todoModel.duration != null
         ? TodoProgressiveCard(
             todoModel: widget.todoModel,
-            key: Key(
-              widget.todoModel.todoId,
-            ),
+            projectColor: AppColors().getColor(widget.projectColor),
+            key: Key(widget.todoModel.todoId),
           )
         : _swipableTile(width);
   }
@@ -114,6 +113,7 @@ class _TodoCardInProjectState extends State<TodoCardInProject> {
         scrollDirection: Axis.vertical,
         child: SelectableText(
           widget.todoModel.content,
+          maxLines: 2,
           style: widget.todoModel.isDone
               ? AppTextStyles.whiteTitleNormal
                   .copyWith(fontWeight: FontWeight.w600)
